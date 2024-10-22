@@ -63,6 +63,13 @@ class Utility:
 
         return cube
     
+    @staticmethod
+    def swapElement(cube):
+        i1, j1, k1 = random.randint(0, len(cube)-1), random.randint(0, len(cube)-1), random.randint(0, len(cube)-1)
+        i2, j2, k2 = random.randint(0, len(cube)-1), random.randint(0, len(cube)-1), random.randint(0, len(cube)-1)
+        
+        cube[i1][j1][k1], cube[i2][j2][k2] = cube[i2][j2][k2], cube[i1][j1][k1]
+    
 class Node:
     def __init__(self, cube_size):
         self.magic_number = Utility.magicNumber(cube_size)
