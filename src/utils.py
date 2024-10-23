@@ -94,6 +94,7 @@ class Node:
     
     def getCubeSize(self):
         return self.cube_size
+    
     def showCube(self):
         for i in range (len(self.cube)):
             for j in range (len(self.cube)):
