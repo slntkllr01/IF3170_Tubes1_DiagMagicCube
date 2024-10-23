@@ -73,9 +73,27 @@ class Utility:
 class Node:
     def __init__(self, cube_size):
         self.magic_number = Utility.magicNumber(cube_size)
-        self.cube = Utility.generateRandomCube(cube_size, self.magic_number // 2) # ini harus dicustomize sih rentangnya...
+        self.cube = Utility.generateRandomCube(cube_size, self.magic_number//2)
+        self.cube_size = cube_size
         self.current_value = 0
     
+    def __eq__(self, other):
+        return self.current_value == other.current_value
+    
+    def __lt__(self, other):
+        return self.current_value < other.current_value
+    
+    def __gt__(self, other):
+        return self.current_value > other.current_value
+    
+    def getCube(self):
+        return self.cube
+    
+    def getElement(self, i, j, k):
+        return self.cube[i][j][k]
+    
+    def getCubeSize(self):
+        return self.cube_size
     def showCube(self):
         for i in range (len(self.cube)):
             for j in range (len(self.cube)):
@@ -83,6 +101,7 @@ class Node:
                     print(self.cube[i][j][k], end=' ')
                 print()
             print()
+
     def calculateHeuristic(self):
         self.current_value = Utility.heuristicFunction(self.cube, self.magic_number)
         return self.current_value
