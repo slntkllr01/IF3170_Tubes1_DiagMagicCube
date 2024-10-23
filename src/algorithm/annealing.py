@@ -1,6 +1,9 @@
-from utils import *
+from utils.node import Node
+from utils.utility import Utility
+import random
 import math
 import time
+
 class Annealing:
     def simulatedAnnealing(cube_size, initial_temp, cooling_rate):
         current = Node(cube_size)

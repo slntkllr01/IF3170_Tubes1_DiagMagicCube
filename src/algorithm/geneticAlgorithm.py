@@ -1,4 +1,6 @@
-from utils import *
+from utils.node import Node
+from utils.utility import Utility
+import random
 
 class GeneticAlgorithm:
     def __init__(self, cube_size, population_size):

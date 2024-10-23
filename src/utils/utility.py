@@ -69,40 +69,25 @@ class Utility:
         i2, j2, k2 = random.randint(0, len(cube)-1), random.randint(0, len(cube)-1), random.randint(0, len(cube)-1)
         
         cube[i1][j1][k1], cube[i2][j2][k2] = cube[i2][j2][k2], cube[i1][j1][k1]
-    
-class Node:
-    def __init__(self, cube_size):
-        self.magic_number = Utility.magicNumber(cube_size)
-        self.cube = Utility.generateRandomCube(cube_size, self.magic_number//2)
-        self.cube_size = cube_size
-        self.current_value = 0
-    
-    def __eq__(self, other):
-        return self.current_value == other.current_value
-    
-    def __lt__(self, other):
-        return self.current_value < other.current_value
-    
-    def __gt__(self, other):
-        return self.current_value > other.current_value
-    
-    def getCube(self):
-        return self.cube
-    
-    def getElement(self, i, j, k):
-        return self.cube[i][j][k]
-    
-    def getCubeSize(self):
-        return self.cube_size
-    
-    def showCube(self):
-        for i in range (len(self.cube)):
-            for j in range (len(self.cube)):
-                for k in range (len(self.cube)):
-                    print(self.cube[i][j][k], end=' ')
-                print()
-            print()
+        
+    @staticmethod
+    # tukar dua angka di dalam cube
+    def swapCubeValue(cube, pos1, pos2):
+        cubetemp = cube
+        i1 = pos1//25
+        j1 = (pos1%25)//5
+        k1 = (pos1%25)%5
 
-    def calculateHeuristic(self):
-        self.current_value = Utility.heuristicFunction(self.cube, self.magic_number)
-        return self.current_value
+        i2 = pos2//25
+        j2 = (pos2%25)//5
+        k2 = (pos2%25)%5
+
+        # tukar posisi angka
+        temp = cubetemp[i1][j1][k1]
+        cubetemp[i1][j1][k1] = cubetemp[i2][j2][k2]
+        cubetemp[i2][j2][k2] = temp
+
+        return cubetemp
+
+
+
