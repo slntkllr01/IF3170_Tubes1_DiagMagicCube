@@ -49,6 +49,8 @@ class Node:
 
         for i in range (125):
             for j in range (125):
+                if i==j or i==62 or j==62:
+                    continue
                 newcube = Utility.swapCubeValue(self.cube, i, j)
                 newval = Utility.heuristicFunction(self.cube, 315)
 
@@ -64,7 +66,7 @@ class Node:
         random1 = random.randint(0, 124)
         random2 = random.randint(0, 124)
 
-        while random1==random2:
+        while random1==random2 or random1==62 or random2==62:
             random1 = random.randint(0, 124)
             random2 = random.randint(0, 124)
 
