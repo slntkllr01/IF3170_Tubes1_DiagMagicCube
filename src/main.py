@@ -6,6 +6,7 @@ from PyQt5.QtGui import QFont, QPalette, QColor
 from PyQt5.QtCore import Qt
 from algorithm.restart import RandomRestart
 from algorithm.stochastic import Stochastic
+from algorithm.annealing import Annealing
 from visualizer.visualizer import CubeVisualizer
 import json
 import matplotlib.pyplot as plt
@@ -46,7 +47,7 @@ class CubeSolverApp(QMainWindow):
         self.layout.addWidget(self.algo_label)
         
         self.algo_dropdown = QComboBox()
-        self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing"])
+        self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing","Simulated Annealing","Genetic"])
         self.algo_dropdown.setFont(QFont("Arial", 11))
         self.algo_dropdown.setStyleSheet("padding: 5px;")
         self.layout.addWidget(self.algo_dropdown)
@@ -61,6 +62,27 @@ class CubeSolverApp(QMainWindow):
         self.param_input.setStyleSheet("padding: 5px;")
         self.layout.addWidget(self.param_input)
  
+        self.temp_label = QLabel("Initial Temperature (Annealing):")
+        self.temp_label.setFont(QFont("Arial", 12))
+        self.layout.addWidget(self.temp_label)
+        
+        self.temp_input = QLineEdit()
+        self.temp_input.setFont(QFont("Arial", 11))
+        self.temp_input.setPlaceholderText("Enter initial temperature")
+        self.temp_input.setStyleSheet("padding: 5px;")
+        self.layout.addWidget(self.temp_input)
+        
+        self.cooling_label = QLabel("Cooling Rate (Annealing):")
+        self.cooling_label.setFont(QFont("Arial", 12))
+        self.layout.addWidget(self.cooling_label)
+        
+        self.cooling_input = QLineEdit()
+        self.cooling_input.setFont(QFont("Arial", 11))
+        self.cooling_input.setPlaceholderText("Enter cooling rate")
+        self.cooling_input.setStyleSheet("padding: 5px;")
+        self.layout.addWidget(self.cooling_input)
+
+
         self.solve_button = QPushButton("Solve Cube")
         self.solve_button.setFont(QFont("Arial", 12, QFont.Bold))
         self.solve_button.setStyleSheet("padding: 10px; background-color: #4CAF50; color: white;")
@@ -96,6 +118,12 @@ class CubeSolverApp(QMainWindow):
             elif algorithm == 1:
                 self.solver = Stochastic()
                 self.solver.solveCube(max_param)
+            elif algorithm == 2:
+                print('Pakai annealing>>>>>>>>>>>>>>>>>>>>>>>>>>>>/////////////////')
+                initial_temp = float(self.temp_input.text())
+                cooling_rate = float(self.cooling_input.text())
+                self.solver = Annealing(initial_temp,cooling_rate)
+                self.solver.simulatedAnnealing()
             else:
                 raise ValueError("Invalid algorithm selection")
             
