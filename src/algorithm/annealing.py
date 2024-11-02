@@ -2,32 +2,40 @@ from utils.node import Node
 from utils.utility import Utility
 import random
 import math
-import time
 
 class Annealing:
-    def simulatedAnnealing(cube_size, initial_temp, cooling_rate):
-        current = Node(cube_size)
+    def __init__(self, initial_temp, cooling_rate):
+        self.initial_temp = initial_temp
+        self.cooling_rate = cooling_rate
+
+    def simulatedAnnealing(self):
+        current = Node(cube_size=5)
         current_heuristic = current.calculateHeuristic()
-        temp = initial_temp
-        
-        # will stop if temperature is 0 
-        start = time.time()
+        temp = self.initial_temp        
         while True:
-            if (temp<=0):
+            if temp <= 0:
                 break
-            neighbor = Node(cube_size)
+            neighbor = Node(cube_size=5)
             Utility.swapElement(neighbor.cube)
             neighbor_heuristic = neighbor.calculateHeuristic()
-            deltaE = neighbor_heuristic-current_heuristic
-            if (deltaE>0):
+            # print("NILAI NEIGHBOR💖: ", neighbor_heuristic)
+            # print("NILAI CURRENT💜: ", current_heuristic)
+            deltaE = neighbor_heuristic - current_heuristic
+            if deltaE > 0:
                 current = neighbor
+                current_heuristic = neighbor_heuristic
+                print("Take good/better moves🫵🫵🫵")
             else:
-                if (math.exp(deltaE/temp)>random.random()):
+                rand = random.random()
+                val = math.exp(deltaE / temp)
+                # print("Ini nilai val: ", val, " dengan deltaE: ", deltaE, "dan nilai temp: ", temp)
+                print("random values is ------------- ", rand, "compared with ---- ", math.exp(deltaE / temp))
+                if  val > rand:
+                    print("Take bad moves❌❌❌ with random: ", rand)
                     current = neighbor
-            temp *= cooling_rate
+                    current_heuristic = neighbor_heuristic
+                else:
+                    print("FAILED TO USE ",val,"BAD MOVES🦋👺 with random ", rand, "and temp: ", temp)
+            temp *=self.cooling_rate
                 
-        end = time.time()
-        time_elapsed = end-start
-        print("Time elapsed: " + str(time_elapsed))
-        return (current,time_elapsed)
-
+        return current
