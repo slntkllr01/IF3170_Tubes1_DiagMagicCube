@@ -5,11 +5,6 @@ from PyQt5.QtCore import Qt, QTimer
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 
-# cara cobanya donwload dulu library pyqt sm matplotlib dulu kalau gapunya, habis itu coba run file ini deh
-# terus coba masukin dummy buat ngetes
-# belum kehubung sama algonya sih nanti sy hubungkan
-# sama teman-temanku yg jago design bolehlah dibagusin kalau sempat
-
 class CubeVisualizer(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -180,7 +175,7 @@ class CubeVisualizer(QMainWindow):
         self.ax.set_title('Cube State')
 
 
-app = QApplication(sys.argv)
-window = CubeVisualizer()
-window.show()
-sys.exit(app.exec_())
+# app = QApplication(sys.argv)
+# window = CubeVisualizer()
+# window.show()
+# sys.exit(app.exec_())
