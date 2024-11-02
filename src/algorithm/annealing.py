@@ -1,24 +1,30 @@
 from utils.node import Node
-from utils.utility import Utility
 import random
 import math
 
 class Annealing:
-    def __init__(self, initial_temp, cooling_rate):
+    def __init__(self, initial_temp, cooling_rate, schedule_type):
         self.Node = Node(cube_size=5)
         self.history = []
-        self.initial_state = None
+        self.average = 0
         self.initial_temp = initial_temp
         self.cooling_rate = cooling_rate
+        self.schedule_type = schedule_type
 
-    def linear_cooling(T_start, alpha, iteration):
-        return T_start - alpha * iteration
+    def linear_cooling(self, temp, iteration):
+        return temp - self.cooling_rate * iteration
 
+    def exponential_cooling(self, temp, iteration):
+        return temp * (self.cooling_rate ** iteration)
+
+    def logarithmic_cooling(self, temp, iteration):
+        return self.initial_temp / (1 + self.cooling_rate * math.log(1 + iteration))
+    
     def simulatedAnnealing(self):
         current = self.Node
         current_heuristic = current.calculateHeuristic()
         temp = self.initial_temp     
-        i = 0   
+        i = 0
         while True:
             if temp <= 0:
                 break
@@ -42,8 +48,13 @@ class Annealing:
                     current_heuristic = neighbor_heuristic
                 else:
                     print("FAILED TO USE ",val,"BAD MOVES🦋👺 with random ", rand, "and temp: ", temp)
-            self.history.append({"frame": 0, "cube": current.cube, "objective_value": current_heuristic})
-            temp = temp - self.cooling_rate * i
+            self.history.append({"frame": i, "cube": current.cube, "objective_value": current_heuristic})
+            if self.schedule_type == "linear":
+                temp = self.linear_cooling(temp, i)
+            elif self.schedule_type == "exponential":
+                temp = self.exponential_cooling(temp, i)
+            elif self.schedule_type == "logarithmic":
+                temp = self.logarithmic_cooling(temp, i)
             i+=1
 
         print("Final state of the cube:")
