@@ -1,19 +1,26 @@
+import copy
 from utils.node import Node
 
 class SidewaysMove:
     def __init__(self):
         self.Node = Node(cube_size=5)
         self.history = []  
-        self.initial_state = self.Node
+        self.initial_state = copy.deepcopy(self.Node)
+        self.history.append({
+            "frame": 0,
+            "cube": copy.deepcopy(self.Node.cube),
+            "objective_value": self.Node.current_value
+        })
 
     def solveCube(self, max_sideways_moves):
         print("Starting search process (Sideways Move Hill-Climbing)")
         
-        i = 0
+        i = 1
         sideways_moves = 0
 
         while True:
             neighbour = self.Node.getHighestSuccessor()
+            print(f"neighbor value : {neighbour.current_value}     current value : {self.Node.current_value} ")
 
             if neighbour.current_value < self.Node.current_value:
                 print("Local maximum reached.")
@@ -30,7 +37,7 @@ class SidewaysMove:
                     print("Max sideways moves reached. Stopping search.")
                     break
 
-            self.history.append({"frame": i, "cube": self.Node.cube, "objective_value": self.Node.current_value})
+            self.history.append({"frame": i, "cube": copy.deepcopy(self.Node.cube),  "objective_value": self.Node.current_value})
             print(f"Updated Node to new value: {self.Node.current_value}")
             i += 1
 

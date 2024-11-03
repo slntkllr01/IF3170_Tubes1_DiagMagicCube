@@ -1,15 +1,21 @@
+import copy
 from utils.node import Node
 
 class Steepest:
     def __init__(self):
         self.Node = Node(cube_size=5)
         self.history = []  
-        self.initial_state = self.Node
+        self.initial_state = copy.deepcopy(self.Node)
+        self.history.append({
+            "frame": 0,
+            "cube": copy.deepcopy(self.Node.cube),
+            "objective_value": self.Node.current_value
+        })
 
     def solveCube(self):
         print("Starting search process (Steepest)")
 
-        i = 0
+        i = 1
         while True:
             neighbour = self.Node.getHighestSuccessor()
 
@@ -19,7 +25,7 @@ class Steepest:
 
             self.Node = neighbour
             print(f"Updated Node to new value: {self.Node.current_value}")
-            self.history.append({"frame": i, "cube": self.Node.cube, "objective_value": self.Node.current_value})
+            self.history.append({"frame": i, "cube": copy.deepcopy(self.Node.cube), "objective_value": self.Node.current_value})
             i += 1
 
         print(f"Initial state of the cube:")
