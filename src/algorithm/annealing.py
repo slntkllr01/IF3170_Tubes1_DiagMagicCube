@@ -1,22 +1,34 @@
 from utils.node import Node
-from utils.utility import Utility
 import random
 import math
 
 class Annealing:
-    def __init__(self, initial_temp, cooling_rate):
+    def __init__(self, initial_temp, cooling_rate, schedule_type):
+        self.Node = Node(cube_size=5)
+        self.history = []
+        self.average = 0
         self.initial_temp = initial_temp
         self.cooling_rate = cooling_rate
+        self.schedule_type = schedule_type
 
+    def linear_cooling(self, temp, iteration):
+        return temp - self.cooling_rate * iteration
+
+    def exponential_cooling(self, temp, iteration):
+        return temp * (self.cooling_rate ** iteration)
+
+    def logarithmic_cooling(self, temp, iteration):
+        return self.initial_temp / (1 + self.cooling_rate * math.log(1 + iteration))
+    
     def simulatedAnnealing(self):
-        current = Node(cube_size=5)
+        current = self.Node
         current_heuristic = current.calculateHeuristic()
-        temp = self.initial_temp        
+        temp = self.initial_temp     
+        i = 0
         while True:
             if temp <= 0:
                 break
-            neighbor = Node(cube_size=5)
-            Utility.swapElement(neighbor.cube)
+            neighbor = self.Node.getRandomSuccessor()
             neighbor_heuristic = neighbor.calculateHeuristic()
             # print("NILAI NEIGHBOR💖: ", neighbor_heuristic)
             # print("NILAI CURRENT💜: ", current_heuristic)
@@ -29,13 +41,24 @@ class Annealing:
                 rand = random.random()
                 val = math.exp(deltaE / temp)
                 # print("Ini nilai val: ", val, " dengan deltaE: ", deltaE, "dan nilai temp: ", temp)
-                print("random values is ------------- ", rand, "compared with ---- ", math.exp(deltaE / temp))
+                # print("random values is ------------- ", rand, "compared with ---- ", math.exp(deltaE / temp))
                 if  val > rand:
                     print("Take bad moves❌❌❌ with random: ", rand)
                     current = neighbor
                     current_heuristic = neighbor_heuristic
                 else:
                     print("FAILED TO USE ",val,"BAD MOVES🦋👺 with random ", rand, "and temp: ", temp)
-            temp *=self.cooling_rate
-                
-        return current
+            self.history.append({"frame": i, "cube": current.cube, "objective_value": current_heuristic})
+            if self.schedule_type == "linear":
+                temp = self.linear_cooling(temp, i)
+            elif self.schedule_type == "exponential":
+                temp = self.exponential_cooling(temp, i)
+            elif self.schedule_type == "logarithmic":
+                temp = self.logarithmic_cooling(temp, i)
+            i+=1
+
+        print("Final state of the cube:")
+        current.showCube()
+        print(f"Final objective function value: {current_heuristic}")
+        print(f"Total iterations: {i}")
+        return self.Node

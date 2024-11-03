@@ -6,21 +6,17 @@ from PyQt5.QtGui import QFont, QPalette, QColor
 from PyQt5.QtCore import Qt
 from algorithm.restart import RandomRestart
 from algorithm.stochastic import Stochastic
+from algorithm.annealing import Annealing
 from visualizer.visualizer import CubeVisualizer
 import json
 import matplotlib.pyplot as plt
 import sys
 import time
 
-# cara cobanya donwload dulu library pyqt sm matplotlib dulu kalau gapunya, habis itu coba run file ini deh
-# terus coba masukin file json
-# sama teman-temanku yg jago design bolehlah dibagusin kalau sempat
-
 class CubeSolverApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Diagonal Magic Cube Solver")
-        self.setFixedSize(800, 600)
         
         self.solver = None
         self.history = None
@@ -46,11 +42,13 @@ class CubeSolverApp(QMainWindow):
         self.layout.addWidget(self.algo_label)
         
         self.algo_dropdown = QComboBox()
-        self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing"])
+        self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing","Simulated Annealing","Genetic"])
         self.algo_dropdown.setFont(QFont("Arial", 11))
         self.algo_dropdown.setStyleSheet("padding: 5px;")
+        self.algo_dropdown.currentIndexChanged.connect(self.toggle_fields)  # Connect to field toggle function
         self.layout.addWidget(self.algo_dropdown)
         
+        # Fields for Random Restart and Annealing
         self.param_label = QLabel("Enter maximum iterations:")
         self.param_label.setFont(QFont("Arial", 12))
         self.layout.addWidget(self.param_label)
@@ -61,6 +59,36 @@ class CubeSolverApp(QMainWindow):
         self.param_input.setStyleSheet("padding: 5px;")
         self.layout.addWidget(self.param_input)
  
+        self.temp_label = QLabel("Initial Temperature (Annealing):")
+        self.temp_label.setFont(QFont("Arial", 12))
+        self.layout.addWidget(self.temp_label)
+        
+        self.temp_input = QLineEdit()
+        self.temp_input.setFont(QFont("Arial", 11))
+        self.temp_input.setPlaceholderText("Enter initial temperature")
+        self.temp_input.setStyleSheet("padding: 5px;")
+        self.layout.addWidget(self.temp_input)
+        
+        self.cooling_label = QLabel("Cooling Rate (Annealing):")
+        self.cooling_label.setFont(QFont("Arial", 12))
+        self.layout.addWidget(self.cooling_label)
+        
+        self.cooling_input = QLineEdit()
+        self.cooling_input.setFont(QFont("Arial", 11))
+        self.cooling_input.setPlaceholderText("Enter cooling rate")
+        self.cooling_input.setStyleSheet("padding: 5px;")
+        self.layout.addWidget(self.cooling_input)
+        
+        self.schedule_label = QLabel("Select Cooling Schedule (Annealing):")
+        self.schedule_label.setFont(QFont("Arial", 12))
+        self.layout.addWidget(self.schedule_label)
+        
+        self.schedule_dropdown = QComboBox()
+        self.schedule_dropdown.addItems(["Linear", "Exponential", "Logarithmic"])
+        self.schedule_dropdown.setFont(QFont("Arial", 11))
+        self.schedule_dropdown.setStyleSheet("padding: 5px;")
+        self.layout.addWidget(self.schedule_dropdown)
+
         self.solve_button = QPushButton("Solve Cube")
         self.solve_button.setFont(QFont("Arial", 12, QFont.Bold))
         self.solve_button.setStyleSheet("padding: 10px; background-color: #4CAF50; color: white;")
@@ -82,10 +110,32 @@ class CubeSolverApp(QMainWindow):
         self.visualizer_button.clicked.connect(self.open_visualizer)
         self.visualizer_button.setEnabled(False)
         self.layout.addWidget(self.visualizer_button)
+
+        # Hide Annealing-specific fields initially
+        self.temp_label.hide()
+        self.temp_input.hide()
+        self.cooling_label.hide()
+        self.cooling_input.hide()
+        self.schedule_label.hide()
+        self.schedule_dropdown.hide()
+
+    def toggle_fields(self):
+        algorithm = self.algo_dropdown.currentIndex()
+        show_maxiterations = (algorithm == 0)|(algorithm == 1)
+        self.param_label.setVisible(show_maxiterations)
+        self.param_input.setVisible(show_maxiterations)
         
+        is_annealing = (algorithm == 2)
+        self.temp_label.setVisible(is_annealing)
+        self.temp_input.setVisible(is_annealing)
+        self.cooling_label.setVisible(is_annealing)
+        self.cooling_input.setVisible(is_annealing)
+        self.schedule_label.setVisible(is_annealing)
+        self.schedule_dropdown.setVisible(is_annealing)
+
     def solve_cube(self):
         try:
-            max_param = int(self.param_input.text())
+            max_param = int(self.param_input.text()) if self.param_input.isVisible() else None
             algorithm = self.algo_dropdown.currentIndex()
             
             start_time = time.time()
@@ -96,6 +146,12 @@ class CubeSolverApp(QMainWindow):
             elif algorithm == 1:
                 self.solver = Stochastic()
                 self.solver.solveCube(max_param)
+            elif algorithm == 2:
+                initial_temp = float(self.temp_input.text())
+                cooling_rate = float(self.cooling_input.text())
+                schedule_type = self.schedule_dropdown.currentText().lower()
+                self.solver = Annealing(initial_temp, cooling_rate, schedule_type)
+                self.solver.simulatedAnnealing()
             else:
                 raise ValueError("Invalid algorithm selection")
             
