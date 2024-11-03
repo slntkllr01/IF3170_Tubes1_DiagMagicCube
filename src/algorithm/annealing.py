@@ -30,25 +30,24 @@ class Annealing:
                 break
             neighbor = self.Node.getRandomSuccessor()
             neighbor_heuristic = neighbor.calculateHeuristic()
-            # print("NILAI NEIGHBOR💖: ", neighbor_heuristic)
-            # print("NILAI CURRENT💜: ", current_heuristic)
             deltaE = neighbor_heuristic - current_heuristic
             if deltaE > 0:
                 current = neighbor
                 current_heuristic = neighbor_heuristic
                 print("Take good/better moves🫵🫵🫵")
+                self.history.append({"frame": i, "cube": current.cube, "objective_value": current_heuristic})
+
             else:
                 rand = random.random()
                 val = math.exp(deltaE / temp)
-                # print("Ini nilai val: ", val, " dengan deltaE: ", deltaE, "dan nilai temp: ", temp)
-                # print("random values is ------------- ", rand, "compared with ---- ", math.exp(deltaE / temp))
                 if  val > rand:
                     print("Take bad moves❌❌❌ with random: ", rand)
                     current = neighbor
                     current_heuristic = neighbor_heuristic
+                    self.history.append({"frame": i, "cube": current.cube, "objective_value": current_heuristic})
+
                 else:
                     print("FAILED TO USE ",val,"BAD MOVES🦋👺 with random ", rand, "and temp: ", temp)
-            self.history.append({"frame": i, "cube": current.cube, "objective_value": current_heuristic})
             if self.schedule_type == "linear":
                 temp = self.linear_cooling(temp, i)
             elif self.schedule_type == "exponential":
