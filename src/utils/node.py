@@ -10,7 +10,7 @@ class Node:
         else:
             self.cube = Utility.generateRandomCube(cube_size, self.magic_number // 2)
 
-        self.current_value = Utility.heuristicFunction(self.cube, self.magic_number)
+        self.current_value = Utility.objectiveFunction(self.cube, self.magic_number)
     
     def __eq__(self, other):
         return self.current_value == other.current_value
@@ -39,7 +39,7 @@ class Node:
             print()
 
     def calculateHeuristic(self):
-        self.current_value = Utility.heuristicFunction(self.cube, self.magic_number)
+        self.current_value = Utility.objectiveFunction(self.cube, self.magic_number)
         return self.current_value
     
     # buat cari sucessor paling oke
@@ -52,7 +52,7 @@ class Node:
                 if i==j or i==62 or j==62:
                     continue
                 newcube = Utility.swapCubeValue(self.cube, i, j)
-                newval = Utility.heuristicFunction(self.cube, 315)
+                newval = Utility.objectiveFunction(self.cube, 315)
 
                 if newval < value:
                     value = newval

@@ -9,8 +9,8 @@ class Utility:
         return (cube_size * (cube_size**3 + 1)) / 2
     
     @staticmethod
-    def heuristicFunction(cube, magic_number):
-        heuristic_cost = 0
+    def objectiveFunction(cube, magic_number):
+        obejective_cost = 0
         n = 5
 
         main_diagonal_1 = 0
@@ -30,9 +30,9 @@ class Utility:
                     col_sum += cube[i][k][j]
                     pillar_sum += cube[k][i][j]
 
-                heuristic_cost += abs(row_sum - magic_number)
-                heuristic_cost += abs(col_sum - magic_number)
-                heuristic_cost += abs(pillar_sum - magic_number)
+                obejective_cost += abs(row_sum - magic_number)
+                obejective_cost += abs(col_sum - magic_number)
+                obejective_cost += abs(pillar_sum - magic_number)
 
             main_diagonal_1 += cube[i][i][i]
             main_diagonal_2 += cube[i][i][n - i - 1]
@@ -41,14 +41,14 @@ class Utility:
             diagonal_ttb += cube[i][i][i]
             diagonal_btt += cube[n - i - 1][i][i]
 
-        heuristic_cost += abs(main_diagonal_1 - magic_number)
-        heuristic_cost += abs(main_diagonal_2 - magic_number)
-        heuristic_cost += abs(diagonal_ltr - magic_number)
-        heuristic_cost += abs(diagonal_rtl - magic_number)
-        heuristic_cost += abs(diagonal_ttb - magic_number)
-        heuristic_cost += abs(diagonal_btt - magic_number)
+        obejective_cost += abs(main_diagonal_1 - magic_number)
+        obejective_cost += abs(main_diagonal_2 - magic_number)
+        obejective_cost += abs(diagonal_ltr - magic_number)
+        obejective_cost += abs(diagonal_rtl - magic_number)
+        obejective_cost += abs(diagonal_ttb - magic_number)
+        obejective_cost += abs(diagonal_btt - magic_number)
 
-        return heuristic_cost
+        return obejective_cost
 
     @staticmethod
     def generateRandomCube(cube_size, magic_number):
