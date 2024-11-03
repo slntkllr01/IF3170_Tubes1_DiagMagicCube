@@ -11,28 +11,31 @@ class SidewaysMove:
         
         i = 0
         sideways_moves = 0
-        max_sideways_moves = 100
+        max_sideways_moves = 2
 
         while i < maxIteration:
             neighbour = self.Node.getHighestSuccessor()
 
-            if neighbour.current_value == 0:
-                self.Node = neighbour
-                self.history.append({"frame": i, "cube": self.Node.cube, "objective_value": self.Node.current_value})
-                break
-
             if neighbour.current_value < self.Node.current_value:
+                print("Local maximum reached.")
                 break
+            
+            if neighbour.current_value > self.Node.current_value:
+                self.Node = neighbour
+                sideways_moves = 0 
 
-            if neighbour.current_value == self.Node.current_value:
+            elif neighbour.current_value == self.Node.current_value:
                 if sideways_moves < max_sideways_moves:
                     sideways_moves += 1
+                    self.Node = neighbour
+                    print(f"Performed a sideways move (count: {sideways_moves})")
                 else:
+                    print("Max sideways moves reached. Stopping search.")
                     break
 
-            self.Node = neighbour
-            print(f"Updated Node to new value: {self.Node.current_value}")
+            # Log and increment iteration
             self.history.append({"frame": i, "cube": self.Node.cube, "objective_value": self.Node.current_value})
+            print(f"Updated Node to new value: {self.Node.current_value}")
             i += 1
 
         print(f"Initial state of the cube:")
