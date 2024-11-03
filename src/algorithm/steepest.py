@@ -6,17 +6,18 @@ class Steepest:
         self.history = []  
         self.initial_state = self.Node
 
-    def solveCube(self, maxIteration):
+    def solveCube(self):
         print("Starting search process (Steepest)")
 
         i = 0
-        while i < maxIteration:
+        while True:
             neighbour = self.Node.getHighestSuccessor()
 
             if neighbour.current_value <= self.Node.current_value:
                 print("Local maximum reached.")
                 break
 
+            self.Node = neighbour
             print(f"Updated Node to new value: {self.Node.current_value}")
             self.history.append({"frame": i, "cube": self.Node.cube, "objective_value": self.Node.current_value})
             i += 1

@@ -7,6 +7,8 @@ from PyQt5.QtCore import Qt
 from algorithm.restart import RandomRestart
 from algorithm.stochastic import Stochastic
 from algorithm.annealing import Annealing
+from algorithm.steepest import Steepest
+from algorithm.sidewaysmove import SidewaysMove
 from visualizer.visualizer import CubeVisualizer
 import json
 import matplotlib.pyplot as plt
@@ -42,13 +44,13 @@ class CubeSolverApp(QMainWindow):
         self.layout.addWidget(self.algo_label)
         
         self.algo_dropdown = QComboBox()
-        self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing","Simulated Annealing","Genetic"])
+        self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing","Simulated Annealing", "Steepest Ascent Hill-Climbing","Sideways Move Hill-Climbing","Genetic"])
         self.algo_dropdown.setFont(QFont("Arial", 11))
         self.algo_dropdown.setStyleSheet("padding: 5px;")
         self.algo_dropdown.currentIndexChanged.connect(self.toggle_fields)  # Connect to field toggle function
         self.layout.addWidget(self.algo_dropdown)
         
-        # Fields for Random Restart and Annealing
+        # Fields for Random Restart, Annealing, SidewaysMove
         self.param_label = QLabel("Enter maximum iterations:")
         self.param_label.setFont(QFont("Arial", 12))
         self.layout.addWidget(self.param_label)
@@ -89,6 +91,17 @@ class CubeSolverApp(QMainWindow):
         self.schedule_dropdown.setStyleSheet("padding: 5px;")
         self.layout.addWidget(self.schedule_dropdown)
 
+        self.sideways_label = QLabel("Enter maximum sideways moves:")
+        self.sideways_label.setFont(QFont("Arial", 12))
+        self.layout.addWidget(self.sideways_label)
+
+        self.sideways_input = QLineEdit()
+        self.sideways_input.setFont(QFont("Arial", 11))
+        self.sideways_input.setPlaceholderText("Enter maximum sideways moves")
+        self.sideways_input.setStyleSheet("padding: 5px;")
+        self.layout.addWidget(self.sideways_input)
+
+
         self.solve_button = QPushButton("Solve Cube")
         self.solve_button.setFont(QFont("Arial", 12, QFont.Bold))
         self.solve_button.setStyleSheet("padding: 10px; background-color: #4CAF50; color: white;")
@@ -119,6 +132,10 @@ class CubeSolverApp(QMainWindow):
         self.schedule_label.hide()
         self.schedule_dropdown.hide()
 
+        # Hide Sideways Move-specific fields initially
+        self.sideways_label.hide()
+        self.sideways_input.hide()
+
     def toggle_fields(self):
         algorithm = self.algo_dropdown.currentIndex()
         show_maxiterations = (algorithm == 0)|(algorithm == 1)
@@ -133,9 +150,14 @@ class CubeSolverApp(QMainWindow):
         self.schedule_label.setVisible(is_annealing)
         self.schedule_dropdown.setVisible(is_annealing)
 
+        is_sideways_move = (algorithm == 4)
+        self.sideways_label.setVisible(is_sideways_move)
+        self.sideways_input.setVisible(is_sideways_move)
+
     def solve_cube(self):
         try:
             max_param = int(self.param_input.text()) if self.param_input.isVisible() else None
+            max_sideways_moves = int(self.sideways_input.text()) if self.sideways_input.isVisible() else None
             algorithm = self.algo_dropdown.currentIndex()
             
             start_time = time.time()
@@ -152,6 +174,12 @@ class CubeSolverApp(QMainWindow):
                 schedule_type = self.schedule_dropdown.currentText().lower()
                 self.solver = Annealing(initial_temp, cooling_rate, schedule_type)
                 self.solver.simulatedAnnealing()
+            elif algorithm == 3:
+                self.solver = Steepest()
+                self.solver.solveCube()
+            elif algorithm == 4:
+                self.solver = SidewaysMove()
+                self.solver.solveCube(max_sideways_moves)
             else:
                 raise ValueError("Invalid algorithm selection")
             
