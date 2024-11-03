@@ -52,10 +52,10 @@ class Utility:
 
     @staticmethod
     def generateRandomCube(cube_size, magic_number):
-        cube = Utility.RandomCube(cube_size,magic_number);
+        cube = Utility.RandomCube(cube_size,magic_number)
 
         while not Utility.eliminateRandomState(cube):
-            cube = Utility.RandomCube(cube_size,magic_number);
+            cube = Utility.RandomCube(cube_size,magic_number)
 
         return cube
     

@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt
 from algorithm.restart import RandomRestart
 from algorithm.stochastic import Stochastic
 from algorithm.annealing import Annealing
+from algorithm.geneticAlgorithm import GeneticAlgorithm
 from algorithm.steepest import Steepest
 from algorithm.sidewaysmove import SidewaysMove
 from visualizer.visualizer import CubeVisualizer
@@ -91,6 +92,26 @@ class CubeSolverApp(QMainWindow):
         self.schedule_dropdown.setStyleSheet("padding: 5px;")
         self.layout.addWidget(self.schedule_dropdown)
 
+        self.maxit_label = QLabel("Enter maximum iterations:")
+        self.maxit_label.setFont(QFont("Arial", 12))
+        self.layout.addWidget(self.maxit_label)
+
+        self.maxit_input = QLineEdit()
+        self.maxit_input.setFont(QFont("Arial", 11))
+        self.maxit_input.setPlaceholderText("Enter a number")
+        self.maxit_input.setStyleSheet("padding: 5px;")
+        self.layout.addWidget(self.maxit_input)
+
+        self.population_total = QLabel("Population Total:")
+        self.population_total.setFont(QFont("Arial", 12))
+        self.layout.addWidget(self.population_total)
+
+        self.population_input = QLineEdit()
+        self.population_input.setFont(QFont("Arial", 11))
+        self.population_input.setPlaceholderText("Enter population total")
+        self.population_input.setStyleSheet("padding: 5px;")
+        self.layout.addWidget(self.population_input)
+
         self.sideways_label = QLabel("Enter maximum sideways moves:")
         self.sideways_label.setFont(QFont("Arial", 12))
         self.layout.addWidget(self.sideways_label)
@@ -131,6 +152,14 @@ class CubeSolverApp(QMainWindow):
         self.cooling_input.hide()
         self.schedule_label.hide()
         self.schedule_dropdown.hide()
+        self.population_input.hide()
+        self.population_total.hide()
+        self.maxit_label.hide()
+        self.maxit_input.hide()
+
+        # Hide Sideways Move-specific fields initially
+        self.sideways_label.hide()
+        self.sideways_input.hide()
 
         # Hide Sideways Move-specific fields initially
         self.sideways_label.hide()
@@ -149,6 +178,20 @@ class CubeSolverApp(QMainWindow):
         self.cooling_input.setVisible(is_annealing)
         self.schedule_label.setVisible(is_annealing)
         self.schedule_dropdown.setVisible(is_annealing)
+
+        is_genetic = (algorithm == 3)
+        self.maxit_label.setVisible(is_genetic)
+        self.maxit_input.setVisible(is_genetic)
+        self.population_total.setVisible(is_genetic)
+        self.population_input.setVisible(is_genetic)
+
+
+        is_genetic = (algorithm == 3)
+        self.maxit_label.setVisible(is_genetic)
+        self.maxit_input.setVisible(is_genetic)
+        self.population_total.setVisible(is_genetic)
+        self.population_input.setVisible(is_genetic)
+
 
         is_sideways_move = (algorithm == 4)
         self.sideways_label.setVisible(is_sideways_move)
@@ -174,6 +217,11 @@ class CubeSolverApp(QMainWindow):
                 schedule_type = self.schedule_dropdown.currentText().lower()
                 self.solver = Annealing(initial_temp, cooling_rate, schedule_type)
                 self.solver.simulatedAnnealing()
+            elif algorithm == 3:
+                max_param = int(self.maxit_input.text())
+                population_total = int(self.population_input.text())
+                self.solver = GeneticAlgorithm(5, population_total, max_param)
+                self.solver.solveGeneticAlgorithm()
             elif algorithm == 3:
                 self.solver = Steepest()
                 self.solver.solveCube()
