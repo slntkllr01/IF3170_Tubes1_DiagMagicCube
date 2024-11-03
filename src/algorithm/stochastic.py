@@ -1,10 +1,15 @@
 from utils.node import Node
-
+import copy
 class Stochastic:
     def __init__(self):
         self.Node = Node(cube_size=5)
         self.history = []  
-        self.initial_state = self.Node  
+        self.initial_state = self.Node
+        self.history.append({
+            "frame": 0,
+            "cube": copy.deepcopy(self.Node.cube),
+            "objective_value": self.Node.current_value
+        })
 
     def solveCube(self, maxIteration):
         print("Starting search process (Stochastic Hill-Climbing)")
@@ -15,7 +20,7 @@ class Stochastic:
 
             if neighbour.current_value == 0:
                 self.Node = neighbour
-                self.history.append({"frame": i, "cube": self.Node.cube, "objective_value": self.Node.current_value})
+                self.history.append({"frame": i, "cube": copy.deepcopy(self.Node.cube),  "objective_value": self.Node.current_value})
                 break
 
             if neighbour.current_value <= self.Node.current_value:
@@ -27,7 +32,7 @@ class Stochastic:
 
                 print(f"Updated Node to new value: {self.Node.current_value}")
 
-            self.history.append({"frame": i, "cube": self.Node.cube, "objective_value": self.Node.current_value})
+                self.history.append({"frame": i, "cube": copy.deepcopy(self.Node.cube),  "objective_value": self.Node.current_value})
             i += 1
 
         print(f"Initial state of the cube:")

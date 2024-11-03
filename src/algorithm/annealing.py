@@ -1,6 +1,7 @@
 from utils.node import Node
 import random
 import math
+import copy
 
 class Annealing:
     def __init__(self, initial_temp, cooling_rate, schedule_type):
@@ -10,6 +11,11 @@ class Annealing:
         self.initial_temp = initial_temp
         self.cooling_rate = cooling_rate
         self.schedule_type = schedule_type
+        self.history.append({
+            "frame": 0,
+            "cube": copy.deepcopy(self.Node.cube),
+            "objective_value": self.Node.current_value
+        })
 
     def linear_cooling(self, temp, iteration):
         return temp - self.cooling_rate * iteration
@@ -21,8 +27,7 @@ class Annealing:
         return self.initial_temp / (1 + self.cooling_rate * math.log(1 + iteration))
     
     def simulatedAnnealing(self):
-        current = self.Node
-        current_heuristic = current.calculateHeuristic()
+        current_heuristic = self.Node.calculateHeuristic()
         temp = self.initial_temp     
         i = 0
         while True:
@@ -32,19 +37,19 @@ class Annealing:
             neighbor_heuristic = neighbor.calculateHeuristic()
             deltaE = neighbor_heuristic - current_heuristic
             if deltaE > 0:
-                current = neighbor
+                self.Node = neighbor
                 current_heuristic = neighbor_heuristic
                 print("Take good/better moves🫵🫵🫵")
-                self.history.append({"frame": i, "cube": current.cube, "objective_value": current_heuristic})
-
+                self.history.append({"frame": i, "cube": copy.deepcopy(self.Node.cube),  "objective_value": self.Node.current_value})
+        
             else:
                 rand = random.random()
                 val = math.exp(deltaE / temp)
                 if  val > rand:
                     print("Take bad moves❌❌❌ with random: ", rand)
-                    current = neighbor
+                    self.Node = neighbor
                     current_heuristic = neighbor_heuristic
-                    self.history.append({"frame": i, "cube": current.cube, "objective_value": current_heuristic})
+                    self.history.append({"frame": i, "cube": copy.deepcopy(self.Node.cube),  "objective_value": self.Node.current_value})
 
                 else:
                     print("FAILED TO USE ",val,"BAD MOVES🦋👺 with random ", rand, "and temp: ", temp)
@@ -57,7 +62,7 @@ class Annealing:
             i+=1
 
         print("Final state of the cube:")
-        current.showCube()
+        self.Node.showCube()
         print(f"Final objective function value: {current_heuristic}")
         print(f"Total iterations: {i}")
         return self.Node
