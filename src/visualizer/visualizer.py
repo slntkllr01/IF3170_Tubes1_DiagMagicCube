@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QSlider, QFi
 from PyQt5.QtCore import Qt, QTimer
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+import numpy as np
 
 class CubeVisualizer(QMainWindow):
     def __init__(self):
@@ -17,7 +18,10 @@ class CubeVisualizer(QMainWindow):
         self.is_playing = False
         self.playback_speed = 1.0
         self.angle_x = 20  
-        self.angle_y = 0    
+        self.angle_y = 0
+        self.current_layer = 0 
+        self.layer_view_mode = False   
+        self.display_mode = "heatmap"
 
         main_layout = QHBoxLayout()
         self.central_widget = QWidget(self)
@@ -27,6 +31,23 @@ class CubeVisualizer(QMainWindow):
         # Control panel 
         control_layout = QVBoxLayout()
         main_layout.addLayout(control_layout)
+
+        # Layer view toggle button
+        self.layer_view_button = QPushButton('Toggle Layer View', self)
+        control_layout.addWidget(self.layer_view_button)
+        self.layer_view_button.clicked.connect(self.toggle_layer_view)
+        self.layer_view_button.setStyleSheet("background-color: #FF5722; color: white; font-weight: bold; padding: 5px")
+
+        # Layer navigation buttons
+        self.next_layer_button = QPushButton('Next Layer', self)
+        control_layout.addWidget(self.next_layer_button)
+        self.next_layer_button.clicked.connect(self.next_layer)
+        self.next_layer_button.setStyleSheet("background-color: #FF9800; color: white; font-weight: bold; padding: 5px")
+
+        self.prev_layer_button = QPushButton('Previous Layer', self)
+        control_layout.addWidget(self.prev_layer_button)
+        self.prev_layer_button.clicked.connect(self.prev_layer)
+        self.prev_layer_button.setStyleSheet("background-color: #FF9800; color: white; font-weight: bold; padding: 5px")
 
         # Load button
         self.load_button = QPushButton('Load Experiment File', self)
@@ -109,6 +130,21 @@ class CubeVisualizer(QMainWindow):
             self.timer.start(int(1000 / self.playback_speed))
         else:
             self.timer.stop()
+    
+    def toggle_layer_view(self):
+        self.layer_view_mode = not self.layer_view_mode
+        self.current_layer = 0
+        self.update_cube_plot()
+
+    def next_layer(self):
+        if self.layer_view_mode and self.current_layer < len(self.cube_states[self.current_index]['cube']) - 1:
+            self.current_layer += 1
+            self.update_cube_plot()
+
+    def prev_layer(self):
+        if self.layer_view_mode and self.current_layer > 0:
+            self.current_layer -= 1
+            self.update_cube_plot()
 
     def update_state(self):
         self.current_index = self.progress_slider.value()
@@ -151,31 +187,49 @@ class CubeVisualizer(QMainWindow):
         self.ax.clear() 
         if self.cube_states:
             cube_state = self.cube_states[self.current_index]['cube']
-            self.plot_cube(cube_state)
+            if self.layer_view_mode:
+                self.plot_layer(cube_state, self.current_layer)
+            else:
+                self.plot_cube(cube_state)
             self.frame_label.setText(f"Frame: {self.current_index}")
-        self.update_view()  
-        self.canvas.draw_idle()  
+        self.update_view()
+        self.canvas.draw_idle()
 
     def plot_cube(self, cube_state):
         n = len(cube_state)
+        max_val = np.max(cube_state)
+        min_val = np.min(cube_state)
         for i in range(n):
             for j in range(n):
                 for k in range(n):
-                    self.ax.text(i + 0.5, j + 0.5, k + 0.5, str(cube_state[i][j][k]), color='black', ha='center', va='center', fontsize=8, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3'))
+                    value = cube_state[i][j][k]
+                    color_intensity = (value - min_val) / (max_val - min_val)
+                    color = plt.cm.RdYlGn(1 - color_intensity, alpha =0.1)  
+                    self.ax.bar3d(i, j, k, 1, 1, 1, color=color, shade=True)
+                    self.ax.text(i + 0.5, j + 0.5, k + 0.5, str(value), color='black', ha='center', va='center', fontsize=8, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3'))
 
         self.ax.set_xlim(0, n)
         self.ax.set_ylim(0, n)
         self.ax.set_zlim(0, n)
-        self.ax.set_xticks(range(n))
-        self.ax.set_yticks(range(n))
-        self.ax.set_zticks(range(n))
-        self.ax.set_xlabel('X-axis')
-        self.ax.set_ylabel('Y-axis')
-        self.ax.set_zlabel('Z-axis')
         self.ax.set_title('Cube State')
 
+    def plot_layer(self, cube_state, layer):
+        n = len(cube_state)
+        max_val = np.max(cube_state[layer])
+        min_val = np.min(cube_state[layer])
+        for j in range(n):
+            for k in range(n):
+                value = cube_state[layer][j][k]
+                color_intensity = (value - min_val) / (max_val - min_val)
+                color = plt.cm.RdYlGn(1 - color_intensity, alpha =0.1)
+                self.ax.bar3d(layer, j, k, 1, 1, 1, color=color, shade=True)
+                self.ax.text(layer + 0.5, j + 0.5, k + 0.5, str(value), color='black', ha='center', va='center', fontsize=8, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3'))
 
-# app = QApplication(sys.argv)
-# window = CubeVisualizer()
-# window.show()
-# sys.exit(app.exec_())
+        self.ax.set_xlim(0, n)
+        self.ax.set_ylim(0, n)
+        self.ax.set_zlim(0, n)
+        self.ax.set_title(f'Cube State - Layer {layer + 1}')
+    
+    def update_view(self):
+        self.ax.view_init(elev=self.angle_x, azim=self.angle_y)  
+        self.canvas.draw_idle()
