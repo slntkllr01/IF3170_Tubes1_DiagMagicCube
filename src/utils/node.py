@@ -48,8 +48,9 @@ class Node:
     
     # buat cari sucessor paling oke
     def getHighestSuccessor(self):
-        bestcube = self.cube
+        bestcube = None
         initcube = copy.deepcopy(self.cube)
+        initval = Utility.objectiveFunction(initcube,315)
         value = self.current_value
 
         for i in range(125):
@@ -57,13 +58,10 @@ class Node:
                 if i == j or i == 62 or j == 62:
                     continue
 
-                newcube = Utility.swapCubeValue(initcube, i, j)
+                newcube = copy.deepcopy(Utility.swapCubeValue(initcube, i, j))
                 newval = Utility.objectiveFunction(newcube, 315)
-
-                if newval == value:
-                    continue
-
-                if newval < value:
+              
+                if newval < value and newval != initval:
                     value = newval
                     bestcube = copy.deepcopy(newcube)
                     
