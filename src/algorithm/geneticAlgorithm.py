@@ -5,9 +5,9 @@ import random
 
 class GeneticAlgorithm:
     def __init__(self, cube_size, population_size, max_iterations):
-        self.population = [Node(cube = None,cube_size = cube_size) for i in range (population_size)]
+        self.population = [Node(cube = None, cube_size = cube_size) for i in range (population_size)]
         self.population_size = population_size
-        self.mutation_rate = 0.1
+        self.mutation_rate = 0.3
         self.max_iterations = max_iterations
         self.history = []
 
@@ -20,6 +20,9 @@ class GeneticAlgorithm:
 
         total = sum(result)
 
+        if total == 0:
+            return [1 / self.population_size] * self.population_size
+    
         for i in range (len(self.population)):
             temp = result[i]
             result[i] = temp / total
@@ -84,11 +87,12 @@ class GeneticAlgorithm:
         return offspring1, offspring2
 
     def solveGeneticAlgorithm(self):
+        optimum_value = float('inf')
         for i in range (self.max_iterations):
             new_generation = []
             fitness_scores = self.calculatePopulationFitness()      
 
-            with ThreadPoolExecutor(max_workers=20) as executor:
+            with ThreadPoolExecutor(max_workers=50) as executor:
                 for _ in range(self.population_size):
                     results = list(executor.map(lambda _: self.createChild(fitness_scores), range(self.population_size // 2)))
             
@@ -96,18 +100,22 @@ class GeneticAlgorithm:
                 new_generation.append(Node(offspring1))
                 new_generation.append(Node(offspring2))
 
-            best_individual = max(new_generation, key=lambda node: node.calculateHeuristic())
+            best_individual = min(new_generation, key=lambda node: node.calculateHeuristic())
             best_fitness = best_individual.calculateHeuristic()
             print(f"Generasi {i + 1}: Fitness terbaik = {best_fitness}")
 
             self.history.append({"frame": i + 1, "cube": best_individual.cube, "objective_value": best_fitness})
             
-            if best_fitness == max(self.population).current_value:
+            if best_fitness == 0:
                 print("Solusi optimal ditemukan!")
                 return best_individual
             
             self.population = new_generation
 
+            if best_fitness < optimum_value:
+                optimum_value = best_fitness
+
         print("Jumlah iterasi maksimum tercapai.")
+        print("Maximum value: ", optimum_value)
         return best_individual
     

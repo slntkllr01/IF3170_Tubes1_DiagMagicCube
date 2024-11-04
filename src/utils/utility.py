@@ -96,7 +96,7 @@ class Utility:
 
         return selisihmeans
     
-    def calculateVarianceSums(cube, magic_number=315):
+    def calculateVarianceSums(cube, magic_number=315):        
         n = 5
         row_sums, col_sums, pillar_sums = [], [], []
         main_diagonal_1, main_diagonal_2 = 0, 0
