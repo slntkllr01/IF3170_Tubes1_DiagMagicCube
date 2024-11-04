@@ -72,18 +72,24 @@ class Node:
     def getRandomSuccessor(self):
         random1 = random.randint(0, 124)
         random2 = random.randint(0, 124)
+        initcube = copy.deepcopy(self.cube)
+        initval = Utility.objectiveFunction(initcube,315)
 
         while random1==random2 or random1==62 or random2==62:
             random1 = random.randint(0, 124)
             random2 = random.randint(0, 124)
 
         newcube = copy.deepcopy(Utility.swapCubeValue(self.cube, random1, random2))
+        newval = Utility.objectiveFunction(newcube, 315)
 
-        while Utility.calculateMeanSums(newcube) > self.mean or Utility.calculateVarianceSums(newcube) > self.variance or Utility.differentValues(newcube,315) > self.diff:
+        while newval==initval or (Utility.calculateMeanSums(newcube) > self.mean and Utility.calculateVarianceSums(newcube) > self.variance and Utility.differentValues(newcube,315) > self.diff):
+            random1 = random.randint(0, 124)
+            random2 = random.randint(0, 124)
             while random1==random2 or random1==62 or random2==62:
                 random1 = random.randint(0, 124)
                 random2 = random.randint(0, 124)
             newcube = copy.deepcopy(Utility.swapCubeValue(self.cube, random1, random2))
+            newval = Utility.objectiveFunction(newcube, 315)
 
         newNode = Node(newcube)
         return newNode

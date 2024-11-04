@@ -34,13 +34,15 @@ class Annealing:
         print("Initial state of the cube:")
         self.Node.showCube()
         current_heuristic = self.Node.calculateHeuristic()
+        print("ini initial")
+        self.Node.showCube()
         initial_heuristic = current_heuristic
         temp = self.initial_temp     
         i = 2
         while True:
             if temp <= 0:
                 break
-            neighbor = self.Node.getRandomSuccessor()
+            neighbor = copy.deepcopy(self.Node.getRandomSuccessor())
             neighbor_heuristic = neighbor.calculateHeuristic()
             deltaE = neighbor_heuristic - current_heuristic
 
