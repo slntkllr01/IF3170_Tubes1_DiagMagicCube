@@ -28,7 +28,6 @@ class RandomRestart:
                 iterations += 1
 
                 restart_history.append(RandomNode.current_value)
-
                 if neighbour.current_value < RandomNode.current_value:
                     RandomNode = neighbour
                 else:

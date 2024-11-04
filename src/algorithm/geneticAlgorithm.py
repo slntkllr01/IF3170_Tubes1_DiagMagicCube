@@ -98,7 +98,6 @@ class GeneticAlgorithm:
 
             best_individual = max(new_generation, key=lambda node: node.calculateHeuristic())
             best_fitness = best_individual.calculateHeuristic()
-
             print(f"Generasi {i + 1}: Fitness terbaik = {best_fitness}")
 
             self.history.append({"frame": i + 1, "cube": best_individual.cube, "objective_value": best_fitness})

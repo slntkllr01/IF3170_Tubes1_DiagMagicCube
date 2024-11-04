@@ -1,5 +1,6 @@
 from utils.utility import Utility
 import random
+import copy
 
 class Node:
     def __init__(self, cube=None, cube_size=5):
@@ -48,27 +49,27 @@ class Node:
     # buat cari sucessor paling oke
     def getHighestSuccessor(self):
         bestcube = self.cube
+        initcube = copy.deepcopy(self.cube)
         value = self.current_value
 
-        for i in range (125):
-            for j in range (125):
-                if i==j or i==62 or j==62:
+        for i in range(125):
+            for j in range(125):
+                if i == j or i == 62 or j == 62:
                     continue
-                newcube = Utility.swapCubeValue(self.cube, i, j)
-                newval = Utility.objectiveFunction(self.cube, 315)
 
-                if newval < value:
-                    newmean = Utility.calculateMeanSums(newcube)
-                    newdiff = Utility.differentValues(newcube,315)
-                    newvar = Utility.calculateVarianceSums(newcube)
-                    if newmean < self.mean and Utility.eliminateRandomState(newcube) and newdiff<self.diff and newvar<self.variance:
-                        value = newval
-                        bestcube = newcube
+                newcube = Utility.swapCubeValue(initcube, i, j)
+                newval = Utility.objectiveFunction(newcube, 315)
+
+                if newval == value:
+                    continue
+
+                if newval < value and Utility.eliminateRandomState(newcube):
+                    value = newval
+                    bestcube = copy.deepcopy(newcube)
                     
-
         newNode = Node(bestcube)
         return newNode
-    
+        
     # buat cari sucessor random kayak simulated dan stochastic
     def getRandomSuccessor(self):
         random1 = random.randint(0, 124)

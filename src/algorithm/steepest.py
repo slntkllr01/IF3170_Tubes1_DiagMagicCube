@@ -24,7 +24,7 @@ class Steepest:
                 self.history.append({"frame": i, "cube": copy.deepcopy(self.Node.cube),  "objective_value": self.Node.current_value})
                 break
 
-            if neighbour.current_value > self.Node.current_value:
+            if neighbour.current_value >= self.Node.current_value:
                 print("Local maximum reached.")
                 break
 
