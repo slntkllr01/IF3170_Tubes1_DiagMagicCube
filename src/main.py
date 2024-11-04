@@ -181,6 +181,8 @@ class CubeSolverApp(QMainWindow):
         self.sideways_label.hide()
         self.sideways_input.hide()
 
+        self.prob_button.hide()
+
     def toggle_fields(self):
         algorithm = self.algo_dropdown.currentIndex()
         is_restart = (algorithm == 0)

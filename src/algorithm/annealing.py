@@ -61,7 +61,7 @@ class Annealing:
                 self.stuck+=1
                 rand = random.random()
                 val = math.exp(-deltaE / temp)
-                self.historyvar.append({"frame": i,"var_value": self.Node.current_value})
+                self.historyvar.append({"frame": i,"var_value": val})
                 if  val > rand:
                     print("Take bad moves❌❌❌ with random: ", rand)
                     print("INI NILAI VAL🤯"+str(-1*deltaE / temp))
