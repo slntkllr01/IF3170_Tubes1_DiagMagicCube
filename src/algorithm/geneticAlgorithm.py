@@ -9,6 +9,7 @@ class GeneticAlgorithm:
         self.population_size = population_size
         self.mutation_rate = 0.1
         self.max_iterations = max_iterations
+        self.history = []
 
     def calculatePopulationFitness(self):
         result = []
@@ -87,7 +88,7 @@ class GeneticAlgorithm:
             new_generation = []
             fitness_scores = self.calculatePopulationFitness()      
 
-            with ThreadPoolExecutor(max_workers=10) as executor:
+            with ThreadPoolExecutor(max_workers=20) as executor:
                 for _ in range(self.population_size):
                     results = list(executor.map(lambda _: self.createChild(fitness_scores), range(self.population_size // 2)))
             
@@ -100,6 +101,8 @@ class GeneticAlgorithm:
 
             print(f"Generasi {i + 1}: Fitness terbaik = {best_fitness}")
 
+            self.history.append({"frame": i + 1, "cube": best_individual.cube, "objective_value": best_fitness})
+            
             if best_fitness == max(self.population).current_value:
                 print("Solusi optimal ditemukan!")
                 return best_individual

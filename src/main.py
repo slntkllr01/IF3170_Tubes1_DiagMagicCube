@@ -49,7 +49,7 @@ class CubeSolverApp(QMainWindow):
         self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing","Simulated Annealing", "Steepest Ascent Hill-Climbing","Sideways Move Hill-Climbing", "Genetic Algorithm"])
         self.algo_dropdown.setFont(QFont("Arial", 11))
         self.algo_dropdown.setStyleSheet("padding: 5px;")
-        self.algo_dropdown.currentIndexChanged.connect(self.toggle_fields)  # Connect to field toggle function
+        self.algo_dropdown.currentIndexChanged.connect(self.toggle_fields)
         self.layout.addWidget(self.algo_dropdown)
 
         self.restart_label = QLabel("Enter maximum restart:")
@@ -160,7 +160,6 @@ class CubeSolverApp(QMainWindow):
         self.param_label.hide()
         self.param_input.hide()
 
-        # Hide Annealing-specific fields initially
         self.temp_label.hide()
         self.temp_input.hide()
         self.cooling_label.hide()
@@ -171,8 +170,6 @@ class CubeSolverApp(QMainWindow):
         self.population_total.hide()
         self.maxit_label.hide()
         self.maxit_input.hide()
-
-        # Hide Sideways Move-specific fields initially
         self.sideways_label.hide()
         self.sideways_input.hide()
 
@@ -193,6 +190,10 @@ class CubeSolverApp(QMainWindow):
         self.cooling_input.setVisible(is_annealing)
         self.schedule_label.setVisible(is_annealing)
         self.schedule_dropdown.setVisible(is_annealing)
+
+        is_sideways_move = (algorithm == 3)
+        self.sideways_label.setVisible(is_sideways_move)
+        self.sideways_input.setVisible(is_sideways_move)
 
         is_sideways_move = (algorithm == 4)
         self.sideways_label.setVisible(is_sideways_move)
