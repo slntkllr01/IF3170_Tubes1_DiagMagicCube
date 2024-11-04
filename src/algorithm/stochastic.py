@@ -26,9 +26,9 @@ class Stochastic:
             if neighbour.current_value <= self.Node.current_value:
                 neighbour2 = neighbour.getHighestSuccessor()
                 if neighbour2.current_value <= self.Node.current_value and neighbour.mean < self.Node.mean and neighbour.variance < self.Node.variance and neighbour.diff < self.Node.diff:
-                    self.Node = neighbour2
+                    self.Node = copy.deepcopy(neighbour2)
                 else:
-                    self.Node = neighbour
+                    self.Node = copy.deepcopy(neighbour)
 
                 print(f"Updated Node to new value: {self.Node.current_value}")
 
@@ -36,7 +36,7 @@ class Stochastic:
             i += 1
 
         print(f"Initial state of the cube:")
-        self.initial_state.showCube
+        self.initial_state.showCube()
         print(f"Final state of the cube:")
         self.Node.showCube()
         print(f"Final objective function value achieved: {self.Node.current_value}")

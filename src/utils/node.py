@@ -63,7 +63,7 @@ class Node:
                 if newval == value:
                     continue
 
-                if newval < value and Utility.eliminateRandomState(newcube):
+                if newval < value:
                     value = newval
                     bestcube = copy.deepcopy(newcube)
                     
