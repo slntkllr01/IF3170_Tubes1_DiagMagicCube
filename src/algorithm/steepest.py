@@ -7,24 +7,29 @@ class Steepest:
         self.history = []  
         self.initial_state = copy.deepcopy(self.Node)
         self.history.append({
-            "frame": 0,
+            "frame": 1,
             "cube": copy.deepcopy(self.Node.cube),
             "objective_value": self.Node.current_value
         })
 
     def solveCube(self):
         print("Starting search process (Steepest)")
-
-        i = 1
+        print(f"Initial Node(Objektif Value) value: {self.Node.current_value}")
+        i = 2
         while True:
             neighbour = self.Node.getHighestSuccessor()
 
-            if neighbour.current_value <= self.Node.current_value:
+            if neighbour.current_value == 0:
+                self.Node = neighbour
+                self.history.append({"frame": i, "cube": copy.deepcopy(self.Node.cube),  "objective_value": self.Node.current_value})
+                break
+
+            if neighbour.current_value > self.Node.current_value:
                 print("Local maximum reached.")
                 break
 
             self.Node = neighbour
-            print(f"Updated Node to new value: {self.Node.current_value}")
+            print(f"Updated Node(Objektif Value) to new value: {self.Node.current_value}")
             self.history.append({"frame": i, "cube": copy.deepcopy(self.Node.cube), "objective_value": self.Node.current_value})
             i += 1
 
@@ -33,6 +38,6 @@ class Steepest:
         print(f"Final state of the cube:")
         self.Node.showCube()
         print(f"Final objective function value achieved: {self.Node.current_value}")
-        print(f"Total iterations until search stopped: {i}")
+        print(f"Total iterations until search stopped: {i-1}")
 
         return self.Node

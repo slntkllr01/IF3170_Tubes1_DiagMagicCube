@@ -12,7 +12,7 @@ class Annealing:
         self.cooling_rate = cooling_rate
         self.schedule_type = schedule_type
         self.history.append({
-            "frame": 0,
+            "frame": 1,
             "cube": copy.deepcopy(self.Node.cube),
             "objective_value": self.Node.current_value
         })
@@ -29,14 +29,20 @@ class Annealing:
     def simulatedAnnealing(self):
         current_heuristic = self.Node.calculateHeuristic()
         temp = self.initial_temp     
-        i = 0
+        i = 2
         while True:
             if temp <= 0:
                 break
             neighbor = self.Node.getRandomSuccessor()
             neighbor_heuristic = neighbor.calculateHeuristic()
             deltaE = neighbor_heuristic - current_heuristic
-            if deltaE > 0:
+
+            if neighbor.current_value == 0:
+                self.Node = neighbor
+                self.history.append({"frame": i, "cube": copy.deepcopy(self.Node.cube),  "objective_value": self.Node.current_value})
+                break
+
+            if deltaE < 0:
                 self.Node = neighbor
                 current_heuristic = neighbor_heuristic
                 print("Take good/better moves🫵🫵🫵")
@@ -45,7 +51,7 @@ class Annealing:
             else:
                 rand = random.random()
                 val = math.exp(deltaE / temp)
-                if  val > rand:
+                if  val <= rand:
                     print("Take bad moves❌❌❌ with random: ", rand)
                     self.Node = neighbor
                     current_heuristic = neighbor_heuristic

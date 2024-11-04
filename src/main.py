@@ -45,7 +45,7 @@ class CubeSolverApp(QMainWindow):
         self.layout.addWidget(self.algo_label)
         
         self.algo_dropdown = QComboBox()
-        self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing","Simulated Annealing", "Steepest Ascent Hill-Climbing","Sideways Move Hill-Climbing","Genetic"])
+        self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing","Simulated Annealing","Genetic", "Steepest Ascent Hill-Climbing","Sideways Move Hill-Climbing"])
         self.algo_dropdown.setFont(QFont("Arial", 11))
         self.algo_dropdown.setStyleSheet("padding: 5px;")
         self.algo_dropdown.currentIndexChanged.connect(self.toggle_fields)  # Connect to field toggle function
@@ -193,7 +193,7 @@ class CubeSolverApp(QMainWindow):
         self.population_input.setVisible(is_genetic)
 
 
-        is_sideways_move = (algorithm == 4)
+        is_sideways_move = (algorithm == 5)
         self.sideways_label.setVisible(is_sideways_move)
         self.sideways_input.setVisible(is_sideways_move)
 
@@ -222,10 +222,10 @@ class CubeSolverApp(QMainWindow):
                 population_total = int(self.population_input.text())
                 self.solver = GeneticAlgorithm(5, population_total, max_param)
                 self.solver.solveGeneticAlgorithm()
-            elif algorithm == 3:
+            elif algorithm == 4:
                 self.solver = Steepest()
                 self.solver.solveCube()
-            elif algorithm == 4:
+            elif algorithm == 5:
                 self.solver = SidewaysMove()
                 self.solver.solveCube(max_sideways_moves)
             else:
