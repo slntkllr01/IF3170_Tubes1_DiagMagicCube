@@ -11,6 +11,9 @@ class Node:
             self.cube = Utility.generateRandomCube(cube_size, self.magic_number)
 
         self.current_value = Utility.objectiveFunction(self.cube, self.magic_number)
+        self.mean = Utility.calculateMeanSums(self.cube)
+        self.variance = Utility.calculateVarianceSums(self.cube)
+        self.diff = Utility.differentValues(self.cube, self.magic_number)
     
     def __eq__(self, other):
         return self.current_value == other.current_value
@@ -55,8 +58,13 @@ class Node:
                 newval = Utility.objectiveFunction(self.cube, 315)
 
                 if newval < value:
-                    value = newval
-                    bestcube = newcube
+                    newmean = Utility.calculateMeanSums(newcube)
+                    newdiff = Utility.differentValues(newcube,315)
+                    newvar = Utility.calculateVarianceSums(newcube)
+                    if newmean < self.mean and Utility.eliminateRandomState(newcube) and newdiff<self.diff and newvar<self.variance:
+                        value = newval
+                        bestcube = newcube
+                    
 
         newNode = Node(bestcube)
         return newNode

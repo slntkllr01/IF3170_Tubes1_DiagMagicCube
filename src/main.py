@@ -29,6 +29,7 @@ class CubeSolverApp(QMainWindow):
         self.layout = QVBoxLayout(self.central_widget)
         self.layout.setContentsMargins(20, 20, 20, 20)
         self.layout.setSpacing(15)
+        self.setFixedSize(600, 650)
 
         palette = self.central_widget.palette()
         palette.setColor(QPalette.Window, QColor("#f0f4f8"))
@@ -50,7 +51,17 @@ class CubeSolverApp(QMainWindow):
         self.algo_dropdown.setStyleSheet("padding: 5px;")
         self.algo_dropdown.currentIndexChanged.connect(self.toggle_fields)  # Connect to field toggle function
         self.layout.addWidget(self.algo_dropdown)
+
+        self.restart_label = QLabel("Enter maximum restart:")
+        self.restart_label.setFont(QFont("Arial", 12))
+        self.layout.addWidget(self.restart_label)
         
+        self.restart_input = QLineEdit()
+        self.restart_input.setFont(QFont("Arial", 11))
+        self.restart_input.setPlaceholderText("Enter a number")
+        self.restart_input.setStyleSheet("padding: 5px;")
+        self.layout.addWidget(self.restart_input)
+
         # Fields for Random Restart, Annealing, SidewaysMove
         self.param_label = QLabel("Enter maximum iterations:")
         self.param_label.setFont(QFont("Arial", 12))
@@ -145,6 +156,10 @@ class CubeSolverApp(QMainWindow):
         self.visualizer_button.setEnabled(False)
         self.layout.addWidget(self.visualizer_button)
 
+        # Hide stochastic fields initially
+        self.param_label.hide()
+        self.param_input.hide()
+
         # Hide Annealing-specific fields initially
         self.temp_label.hide()
         self.temp_input.hide()
@@ -161,15 +176,15 @@ class CubeSolverApp(QMainWindow):
         self.sideways_label.hide()
         self.sideways_input.hide()
 
-        # Hide Sideways Move-specific fields initially
-        self.sideways_label.hide()
-        self.sideways_input.hide()
-
     def toggle_fields(self):
         algorithm = self.algo_dropdown.currentIndex()
-        show_maxiterations = (algorithm == 0)|(algorithm == 1)
-        self.param_label.setVisible(show_maxiterations)
-        self.param_input.setVisible(show_maxiterations)
+        is_restart = (algorithm == 0)
+        self.restart_label.setVisible(is_restart)
+        self.restart_input.setVisible(is_restart)
+
+        is_stochastic = (algorithm == 1)
+        self.param_label.setVisible(is_stochastic)
+        self.param_input.setVisible(is_stochastic)
         
         is_annealing = (algorithm == 2)
         self.temp_label.setVisible(is_annealing)
@@ -189,14 +204,10 @@ class CubeSolverApp(QMainWindow):
         self.population_total.setVisible(is_genetic)
         self.population_input.setVisible(is_genetic)
 
-
-        is_sideways_move = (algorithm == 5)
-        self.sideways_label.setVisible(is_sideways_move)
-        self.sideways_input.setVisible(is_sideways_move)
-
     def solve_cube(self):
         try:
             max_param = int(self.param_input.text()) if self.param_input.isVisible() else None
+            restart_param = int(self.restart_input.text()) if self.restart_input.isVisible() else None
             max_sideways_moves = int(self.sideways_input.text()) if self.sideways_input.isVisible() else None
             algorithm = self.algo_dropdown.currentIndex()
             
@@ -204,7 +215,7 @@ class CubeSolverApp(QMainWindow):
 
             if algorithm == 0:
                 self.solver = RandomRestart()
-                self.solver.solveCube(max_param)
+                self.solver.solveCube(restart_param)
             elif algorithm == 1:
                 self.solver = Stochastic()
                 self.solver.solveCube(max_param)
@@ -215,14 +226,9 @@ class CubeSolverApp(QMainWindow):
                 self.solver = Annealing(initial_temp, cooling_rate, schedule_type)
                 self.solver.simulatedAnnealing()
             elif algorithm == 3:
-                max_param = int(self.maxit_input.text())
-                population_total = int(self.population_input.text())
-                self.solver = GeneticAlgorithm(5, population_total, max_param)
-                self.solver.solveGeneticAlgorithm()
-            elif algorithm == 4:
                 self.solver = Steepest()
                 self.solver.solveCube()
-            elif algorithm == 5:
+            elif algorithm == 4:
                 self.solver = SidewaysMove()
                 self.solver.solveCube(max_sideways_moves)
             elif algorithm == 5:
@@ -252,18 +258,31 @@ class CubeSolverApp(QMainWindow):
             QMessageBox.warning(self, "Error", "No solver history found.")
             return
         
-        frames = [entry["frame"] for entry in self.history]
-        objective_values = [entry["objective_value"] for entry in self.history]
-        
-   
-        plt.figure()
-        plt.plot(frames, objective_values, marker='o', color='#4CAF50')
-        plt.xlabel("Iteration")
-        plt.ylabel("Objective Function Value")
-        plt.title("Objective Function Value over Iterations")
-        plt.grid(True)
-        plt.show()
+        algorithm = self.algo_dropdown.currentIndex()
+        if algorithm==0:
+            plt.figure()
+            for entry in self.history:
+                frames = list(range(1, len(entry["objective_values"]) + 1))
+                plt.plot(frames, entry["objective_values"], marker='o', label=f"Restart {entry['restart']}")
+
+            plt.xlabel("Iteration")
+            plt.ylabel("Objective Function Value")
+            plt.title("Objective Function Value per Iteration for Each Restart")
+            plt.legend()
+            plt.grid(True)
+            plt.show()
+        else:
+            frames = [entry["frame"] for entry in self.history]
+            objective_values = [entry["objective_value"] for entry in self.history]
     
+            plt.figure()
+            plt.plot(frames, objective_values, marker='o', color='#4CAF50')
+            plt.xlabel("Iteration")
+            plt.ylabel("Objective Function Value")
+            plt.title("Objective Function Value over Iterations")
+            plt.grid(True)
+            plt.show()
+        
     def open_visualizer(self):
         # Open the CubeVisualizer 
         self.visualizer_window = CubeVisualizer()

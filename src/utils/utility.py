@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 class Utility:
     def __init__(self):
@@ -10,7 +11,7 @@ class Utility:
     
     @staticmethod
     def objectiveFunction(cube, magic_number):
-        obejective_cost = 0
+        objective_cost = 0
         n = 5
 
         main_diagonal_1 = 0
@@ -30,9 +31,9 @@ class Utility:
                     col_sum += cube[i][k][j]
                     pillar_sum += cube[k][i][j]
 
-                obejective_cost += abs(row_sum - magic_number)
-                obejective_cost += abs(col_sum - magic_number)
-                obejective_cost += abs(pillar_sum - magic_number)
+                objective_cost += abs(row_sum - magic_number)
+                objective_cost += abs(col_sum - magic_number)
+                objective_cost += abs(pillar_sum - magic_number)
 
             main_diagonal_1 += cube[i][i][i]
             main_diagonal_2 += cube[i][i][n - i - 1]
@@ -41,14 +42,14 @@ class Utility:
             diagonal_ttb += cube[i][i][i]
             diagonal_btt += cube[n - i - 1][i][i]
 
-        obejective_cost += abs(main_diagonal_1 - magic_number)
-        obejective_cost += abs(main_diagonal_2 - magic_number)
-        obejective_cost += abs(diagonal_ltr - magic_number)
-        obejective_cost += abs(diagonal_rtl - magic_number)
-        obejective_cost += abs(diagonal_ttb - magic_number)
-        obejective_cost += abs(diagonal_btt - magic_number)
+        objective_cost += abs(main_diagonal_1 - magic_number)
+        objective_cost += abs(main_diagonal_2 - magic_number)
+        objective_cost += abs(diagonal_ltr - magic_number)
+        objective_cost += abs(diagonal_rtl - magic_number)
+        objective_cost += abs(diagonal_ttb - magic_number)
+        objective_cost += abs(diagonal_btt - magic_number)
 
-        return obejective_cost
+        return objective_cost
 
     @staticmethod
     def generateRandomCube(cube_size, magic_number):
@@ -58,6 +59,142 @@ class Utility:
             cube = Utility.RandomCube(cube_size,magic_number)
 
         return cube
+    
+    def calculateMeanSums(cube):
+        n = 5
+        row_sums, col_sums, pillar_sums = [], [], []
+        main_diagonal_1, main_diagonal_2 = 0, 0
+        diagonal_ltr, diagonal_rtl = 0, 0
+        diagonal_ttb, diagonal_btt = 0, 0
+
+        # Calculate sums
+        for i in range(n):
+            for j in range(n):
+                row_sum, col_sum, pillar_sum = 0, 0, 0
+                for k in range(n):
+                    row_sum += cube[i][j][k]
+                    col_sum += cube[i][k][j]
+                    pillar_sum += cube[k][i][j]
+
+                # Track sums
+                row_sums.append(row_sum)
+                col_sums.append(col_sum)
+                pillar_sums.append(pillar_sum)
+
+            # Diagonals
+            main_diagonal_1 += cube[i][i][i]
+            main_diagonal_2 += cube[i][i][n - i - 1]
+            diagonal_ltr += cube[i][n - i - 1][i]
+            diagonal_rtl += cube[n - i - 1][i][i]
+            diagonal_ttb += cube[i][i][i]
+            diagonal_btt += cube[n - i - 1][i][i]
+
+        # Calculate means
+        means = (np.mean(row_sums) + np.mean(col_sums) + np.mean(pillar_sums) + main_diagonal_1 + main_diagonal_2 + diagonal_ltr + diagonal_rtl + diagonal_ttb + diagonal_btt) / 9
+        
+        selisihmeans = abs(315 - means)
+
+        return selisihmeans
+    
+    def calculateVarianceSums(cube, magic_number=315):
+        n = 5
+        row_sums, col_sums, pillar_sums = [], [], []
+        main_diagonal_1, main_diagonal_2 = 0, 0
+        diagonal_ltr, diagonal_rtl = 0, 0
+        diagonal_ttb, diagonal_btt = 0, 0
+
+        # Calculate sums for rows, columns, pillars, and diagonals
+        for i in range(n):
+            for j in range(n):
+                row_sum, col_sum, pillar_sum = 0, 0, 0
+                for k in range(n):
+                    row_sum += cube[i][j][k]
+                    col_sum += cube[i][k][j]
+                    pillar_sum += cube[k][i][j]
+
+                # Track sums
+                row_sums.append(row_sum)
+                col_sums.append(col_sum)
+                pillar_sums.append(pillar_sum)
+
+            # Diagonals
+            main_diagonal_1 += cube[i][i][i]
+            main_diagonal_2 += cube[i][i][n - i - 1]
+            diagonal_ltr += cube[i][n - i - 1][i]
+            diagonal_rtl += cube[n - i - 1][i][i]
+            diagonal_ttb += cube[i][i][i]
+            diagonal_btt += cube[n - i - 1][i][i]
+
+        # Collect all diagonal values
+        diagonals = [
+            main_diagonal_1, main_diagonal_2,
+            diagonal_ltr, diagonal_rtl,
+            diagonal_ttb, diagonal_btt
+        ]
+
+        # Calculate variances
+        variances = {
+            "row_variance": np.var(row_sums),
+            "col_variance": np.var(col_sums),
+            "pillar_variance": np.var(pillar_sums),
+            "diagonal_variance": np.var(diagonals)
+        }
+
+        # Calculate mean of variances and deviation from magic number
+        mean_variance = (variances["row_variance"] + variances["col_variance"] +
+                        variances["pillar_variance"] + variances["diagonal_variance"]) / 4
+
+        return mean_variance
+    
+    def differentValues(cube, magic_number):
+        diff = 0
+        n = 5
+
+        main_diagonal_1 = 0
+        main_diagonal_2 = 0
+        diagonal_ltr = 0
+        diagonal_rtl = 0
+        diagonal_ttb = 0
+        diagonal_btt = 0
+
+        for i in range(n):
+            for j in range(n):
+                row_sum = 0
+                col_sum = 0
+                pillar_sum = 0
+                for k in range(n):
+                    row_sum += cube[i][j][k]
+                    col_sum += cube[i][k][j]
+                    pillar_sum += cube[k][i][j]
+
+                if row_sum != magic_number:
+                    diff+=1
+                if col_sum != magic_number:
+                    diff+=1
+                if pillar_sum != magic_number:
+                    diff+=1
+
+            main_diagonal_1 += cube[i][i][i]
+            main_diagonal_2 += cube[i][i][n - i - 1]
+            diagonal_ltr += cube[i][n - i - 1][i]
+            diagonal_rtl += cube[n - i - 1][i][i]
+            diagonal_ttb += cube[i][i][i]
+            diagonal_btt += cube[n - i - 1][i][i]
+
+        if main_diagonal_1!=magic_number:
+            diff+=1
+        if main_diagonal_2!=magic_number:
+            diff+=1
+        if diagonal_ltr!=magic_number:
+            diff+=1
+        if diagonal_rtl!=magic_number:
+            diff+=1
+        if diagonal_btt!=magic_number:
+            diff+=1
+        if diagonal_ttb!=magic_number:
+            diff+=1
+
+        return diff
     
     def RandomCube(cube_size, magic_number):
         cube = [[[0 for k in range (cube_size)] for j in range (cube_size)] for i in range (cube_size)]

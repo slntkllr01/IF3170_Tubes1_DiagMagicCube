@@ -25,7 +25,7 @@ class Stochastic:
 
             if neighbour.current_value <= self.Node.current_value:
                 neighbour2 = neighbour.getHighestSuccessor()
-                if neighbour2.current_value <= self.Node.current_value:
+                if neighbour2.current_value <= self.Node.current_value and neighbour.mean < self.Node.mean and neighbour.variance < self.Node.variance and neighbour.diff < self.Node.diff:
                     self.Node = neighbour2
                 else:
                     self.Node = neighbour
