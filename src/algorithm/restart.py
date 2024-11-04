@@ -39,7 +39,8 @@ class RandomRestart:
                 print(f"New best value found: {currvalue} (Restart {i + 1}, Iterations: {iterations})")
 
             self.history.append({
-                "restart": i + 1,
+                "frame": i + 1,
+                "cube" : RandomNode.cube,
                 "objective_values": restart_history,
                 "final_objective_value": currvalue,
                 "iterations": iterations

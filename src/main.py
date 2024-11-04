@@ -264,7 +264,7 @@ class CubeSolverApp(QMainWindow):
             plt.figure()
             for entry in self.history:
                 frames = list(range(1, len(entry["objective_values"]) + 1))
-                plt.plot(frames, entry["objective_values"], marker='o', label=f"Restart {entry['restart']}")
+                plt.plot(frames, entry["objective_values"], marker='o', label=f"Restart {entry['frame']}")
 
             plt.xlabel("Iteration")
             plt.ylabel("Objective Function Value")
