@@ -34,8 +34,7 @@ class Annealing:
         print("Initial state of the cube:")
         self.Node.showCube()
         current_heuristic = self.Node.calculateHeuristic()
-        print("ini initial")
-        self.Node.showCube()
+        initial = copy.deepcopy(self.Node)
         initial_heuristic = current_heuristic
         temp = self.initial_temp     
         i = 2
@@ -87,4 +86,6 @@ class Annealing:
         print(f"Final objective function value: {current_heuristic}")
         print(f"Total iterations: {i}")
         print(f"Stuck in local optima: {self.stuck}")
+        print("ini initial")
+        initial.showCube()
         return self.Node
