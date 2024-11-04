@@ -82,7 +82,7 @@ class Node:
         newcube = copy.deepcopy(Utility.swapCubeValue(self.cube, random1, random2))
         newval = Utility.objectiveFunction(newcube, 315)
 
-        while newval==initval or (Utility.calculateMeanSums(newcube) > self.mean and Utility.calculateVarianceSums(newcube) > self.variance and Utility.differentValues(newcube,315) > self.diff):
+        while newval==initval and (Utility.calculateMeanSums(newcube) > self.mean and Utility.calculateVarianceSums(newcube) > self.variance and Utility.differentValues(newcube,315) > self.diff):
             random1 = random.randint(0, 124)
             random2 = random.randint(0, 124)
             while random1==random2 or random1==62 or random2==62:
