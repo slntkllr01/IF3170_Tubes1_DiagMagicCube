@@ -5,13 +5,13 @@ import random
 
 class GeneticAlgorithm:
     def __init__(self, cube_size, population_size, max_iterations):
-        self.population = [Node(cube_size = cube_size) for i in range (population_size)]
+        self.population = [Node(cube = None,cube_size = cube_size) for i in range (population_size)]
         self.population_size = population_size
         self.mutation_rate = 0.1
         self.max_iterations = max_iterations
 
     def calculatePopulationFitness(self):
-        result = [0 for i in range (len(self.population))]
+        result = []
         max_nodes = max(self.population).current_value
 
         for i in range (len(self.population)):
@@ -45,7 +45,7 @@ class GeneticAlgorithm:
             if start <= random_number < end:
                 return self.population[i].cube
 
-    def crossover(parent1, parent2):
+    def crossover(self, parent1, parent2):
         cutting_point_x = random.randint(0, 4)
         cutting_point_y = random.randint(0, 4)
         cutting_point_z = random.randint(0, 4)
@@ -57,19 +57,22 @@ class GeneticAlgorithm:
             for j in range (5):
                 for k in range (5):
                     if (i < cutting_point_x) or (i == cutting_point_x and j < cutting_point_y) or (i == cutting_point_x and j == cutting_point_y and k <= cutting_point_z):
-                        offspring1[i][j][k] = parent1.cube[i][j][k]
-                        offspring2[i][j][k] = parent2.cube[i][j][k]
+                        offspring1[i][j][k] = parent1[i][j][k]
+                        offspring2[i][j][k] = parent2[i][j][k]
                     else:
-                        offspring1[i][j][k] = parent2.cube[i][j][k]
-                        offspring2[i][j][k] = parent1.cube[i][j][k]
+                        offspring1[i][j][k] = parent2[i][j][k]
+                        offspring2[i][j][k] = parent1[i][j][k]
 
         return offspring1, offspring2
-    def mutation(offspring):
-         Utility.swapCubeValue(offspring)
+    def mutation(self, offspring):
+         Utility.swapElement(offspring)
 
     def createChild(self, fitness_scores):
         parent1 = self.selection()
         parent2 = self.selection()
+        while (not parent1) or (not parent2):
+            parent1 = self.selection()
+            parent2 = self.selection()
 
         offspring1, offspring2 = self.crossover(parent1, parent2)
 
@@ -82,31 +85,27 @@ class GeneticAlgorithm:
     def solveGeneticAlgorithm(self):
         for i in range (self.max_iterations):
             new_generation = []
-            fitness_scores = self.calculatePopulationFitness()
+            fitness_scores = self.calculatePopulationFitness()      
 
-            with ThreadPoolExecutor(max_workers=5) as executor:
+            with ThreadPoolExecutor(max_workers=10) as executor:
                 for _ in range(self.population_size):
-                    results = list(executor.map(self.createChild(fitness_scores), range(self.population_size // 2)))
+                    results = list(executor.map(lambda _: self.createChild(fitness_scores), range(self.population_size // 2)))
             
             for offspring1, offspring2 in results:
                 new_generation.append(Node(offspring1))
                 new_generation.append(Node(offspring2))
 
-            self.population = new_generation
-
-            best_individual = max(self.population, key=lambda node: node.calculateHeuristic())
+            best_individual = max(new_generation, key=lambda node: node.calculateHeuristic())
             best_fitness = best_individual.calculateHeuristic()
 
             print(f"Generasi {i + 1}: Fitness terbaik = {best_fitness}")
 
-            if best_fitness == max(self.population).current_value:  # Misalnya, kondisi optimal tercapai
+            if best_fitness == max(self.population).current_value:
                 print("Solusi optimal ditemukan!")
                 return best_individual
             
+            self.population = new_generation
+
         print("Jumlah iterasi maksimum tercapai.")
         return best_individual
     
-# genetic_algorithm = GeneticAlgorithm(5, 20, 100)
-# best_individual = genetic_algorithm.solveGeneticAlgorithm()
-
-# print(best_individual.getCube())

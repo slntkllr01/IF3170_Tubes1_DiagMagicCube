@@ -8,7 +8,7 @@ class Node:
         if cube is not None:
             self.cube = cube
         else:
-            self.cube = Utility.generateRandomCube(cube_size, self.magic_number // 2)
+            self.cube = Utility.generateRandomCube(cube_size, self.magic_number)
 
         self.current_value = Utility.objectiveFunction(self.cube, self.magic_number)
     

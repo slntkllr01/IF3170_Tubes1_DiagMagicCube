@@ -45,7 +45,7 @@ class CubeSolverApp(QMainWindow):
         self.layout.addWidget(self.algo_label)
         
         self.algo_dropdown = QComboBox()
-        self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing","Simulated Annealing","Genetic", "Steepest Ascent Hill-Climbing","Sideways Move Hill-Climbing"])
+        self.algo_dropdown.addItems(["Random Restart Hill-Climbing", "Stochastic Hill-Climbing","Simulated Annealing", "Steepest Ascent Hill-Climbing","Sideways Move Hill-Climbing", "Genetic Algorithm"])
         self.algo_dropdown.setFont(QFont("Arial", 11))
         self.algo_dropdown.setStyleSheet("padding: 5px;")
         self.algo_dropdown.currentIndexChanged.connect(self.toggle_fields)  # Connect to field toggle function
@@ -179,14 +179,11 @@ class CubeSolverApp(QMainWindow):
         self.schedule_label.setVisible(is_annealing)
         self.schedule_dropdown.setVisible(is_annealing)
 
-        is_genetic = (algorithm == 3)
-        self.maxit_label.setVisible(is_genetic)
-        self.maxit_input.setVisible(is_genetic)
-        self.population_total.setVisible(is_genetic)
-        self.population_input.setVisible(is_genetic)
+        is_sideways_move = (algorithm == 4)
+        self.sideways_label.setVisible(is_sideways_move)
+        self.sideways_input.setVisible(is_sideways_move)
 
-
-        is_genetic = (algorithm == 3)
+        is_genetic = (algorithm == 5)
         self.maxit_label.setVisible(is_genetic)
         self.maxit_input.setVisible(is_genetic)
         self.population_total.setVisible(is_genetic)
@@ -228,6 +225,11 @@ class CubeSolverApp(QMainWindow):
             elif algorithm == 5:
                 self.solver = SidewaysMove()
                 self.solver.solveCube(max_sideways_moves)
+            elif algorithm == 5:
+                max_param = int(self.maxit_input.text())
+                population_total = int(self.population_input.text())
+                self.solver = GeneticAlgorithm(5, population_total, max_param)
+                self.solver.solveGeneticAlgorithm()
             else:
                 raise ValueError("Invalid algorithm selection")
             
