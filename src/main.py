@@ -98,7 +98,7 @@ class CubeSolverApp(QMainWindow):
         self.layout.addWidget(self.schedule_label)
         
         self.schedule_dropdown = QComboBox()
-        self.schedule_dropdown.addItems(["Linear", "Exponential", "Logarithmic"])
+        self.schedule_dropdown.addItems(["Linear", "Exponential", "Logarithmic", "Quadratic"])
         self.schedule_dropdown.setFont(QFont("Arial", 11))
         self.schedule_dropdown.setStyleSheet("padding: 5px;")
         self.layout.addWidget(self.schedule_dropdown)

@@ -81,6 +81,12 @@ class Node:
 
         newcube = Utility.swapCubeValue(self.cube, random1, random2)
 
+        while Utility.calculateMeanSums(newcube) > self.mean or Utility.calculateVarianceSums(newcube) > self.variance or Utility.differentValues(newcube,315) > self.diff:
+            while random1==random2 or random1==62 or random2==62:
+                random1 = random.randint(0, 124)
+                random2 = random.randint(0, 124)
+            newcube = Utility.swapCubeValue(self.cube, random1, random2)
+
         newNode = Node(newcube)
         return newNode
 
