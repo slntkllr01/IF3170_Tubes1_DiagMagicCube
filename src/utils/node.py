@@ -7,7 +7,7 @@ class Node:
         self.magic_number = Utility.magicNumber(cube_size)
         
         if cube is not None:
-            self.cube = cube
+            self.cube = copy.deepcopy(cube)
         else:
             self.cube = Utility.generateRandomCube(cube_size, self.magic_number)
 
@@ -48,8 +48,9 @@ class Node:
     
     # buat cari sucessor paling oke
     def getHighestSuccessor(self):
-        bestcube = self.cube
+        bestcube = None
         initcube = copy.deepcopy(self.cube)
+        initval = Utility.objectiveFunction(initcube,315)
         value = self.current_value
 
         for i in range(125):
@@ -57,13 +58,10 @@ class Node:
                 if i == j or i == 62 or j == 62:
                     continue
 
-                newcube = Utility.swapCubeValue(initcube, i, j)
+                newcube = copy.deepcopy(Utility.swapCubeValue(initcube, i, j))
                 newval = Utility.objectiveFunction(newcube, 315)
-
-                if newval == value:
-                    continue
-
-                if newval < value and Utility.eliminateRandomState(newcube):
+              
+                if newval < value and newval != initval:
                     value = newval
                     bestcube = copy.deepcopy(newcube)
                     
@@ -79,13 +77,13 @@ class Node:
             random1 = random.randint(0, 124)
             random2 = random.randint(0, 124)
 
-        newcube = Utility.swapCubeValue(self.cube, random1, random2)
+        newcube = copy.deepcopy(Utility.swapCubeValue(self.cube, random1, random2))
 
         while Utility.calculateMeanSums(newcube) > self.mean or Utility.calculateVarianceSums(newcube) > self.variance or Utility.differentValues(newcube,315) > self.diff:
             while random1==random2 or random1==62 or random2==62:
                 random1 = random.randint(0, 124)
                 random2 = random.randint(0, 124)
-            newcube = Utility.swapCubeValue(self.cube, random1, random2)
+            newcube = copy.deepcopy(Utility.swapCubeValue(self.cube, random1, random2))
 
         newNode = Node(newcube)
         return newNode

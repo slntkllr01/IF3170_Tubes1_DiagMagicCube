@@ -1,6 +1,5 @@
 from utils.node import Node
-import matplotlib.pyplot as plt
-import json
+import copy
 
 class RandomRestart:
     def __init__(self):
@@ -29,13 +28,13 @@ class RandomRestart:
 
                 restart_history.append(RandomNode.current_value)
                 if neighbour.current_value < RandomNode.current_value:
-                    RandomNode = neighbour
+                    RandomNode = copy.deepcopy(neighbour)
                 else:
                     break 
 
             if RandomNode.current_value < currvalue:
                 currvalue = RandomNode.current_value
-                currcube = RandomNode
+                currcube = copy.deepcopy(RandomNode)
                 print(f"New best value found: {currvalue} (Restart {i + 1}, Iterations: {iterations})")
 
             self.history.append({
