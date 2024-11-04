@@ -43,7 +43,7 @@ class GeneticAlgorithm:
 
     def selection(self):
         intervals = self.createInterval()
-        random_number = random.randint(0, 1)
+        random_number = random.random()
 
         for i, (start, end) in enumerate(intervals):
             if start <= random_number < end:
@@ -80,7 +80,7 @@ class GeneticAlgorithm:
 
         offspring1, offspring2 = self.crossover(parent1, parent2)
 
-        if random.randint(0, 1) < self.mutation_rate:
+        if random.random() < self.mutation_rate:
             self.mutation(offspring1)
             self.mutation(offspring2)
 
@@ -92,7 +92,7 @@ class GeneticAlgorithm:
             new_generation = []
             fitness_scores = self.calculatePopulationFitness()      
 
-            with ThreadPoolExecutor(max_workers=50) as executor:
+            with ThreadPoolExecutor(max_workers=20) as executor:
                 for _ in range(self.population_size):
                     results = list(executor.map(lambda _: self.createChild(fitness_scores), range(self.population_size // 2)))
             
