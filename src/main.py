@@ -247,6 +247,8 @@ class CubeSolverApp(QMainWindow):
                 schedule_type = self.schedule_dropdown.currentText().lower()
                 self.solver = Annealing(initial_temp, cooling_rate, schedule_type)
                 self.solver.simulatedAnnealing()
+                self.prob_button.setEnabled(True)
+                self.historyvar = self.solver.historyvar
             elif algorithm == 3:
                 self.solver = Steepest()
                 self.solver.solveCube()
@@ -259,6 +261,7 @@ class CubeSolverApp(QMainWindow):
                 self.solver = GeneticAlgorithm(5, population_total, max_param)
                 self.solver.solveGeneticAlgorithm()
                 self.mean_GA.setEnabled(True)
+                self.mean_history = self.solver.mean_history
             else:
                 raise ValueError("Invalid algorithm selection")
             
@@ -267,13 +270,8 @@ class CubeSolverApp(QMainWindow):
             print("INI "+str(duration))
 
             self.history = self.solver.history
-            self.mean_history = self.solver.mean_history
+
             self.plot_button.setEnabled(True)
-
-            self.visualizer_button.setEnabled(True)
-
-            self.historyvar = self.solver.historyvar
-            self.prob_button.setEnabled(True)
             self.visualizer_button.setEnabled(True)
             
             # Save history to JSON
@@ -298,8 +296,6 @@ class CubeSolverApp(QMainWindow):
         plt.title("Average Objective Function Value per Iteration Across Population")
         plt.grid(True)
         plt.show()
-
-
 
     def show_plot(self):
         if self.history is None:
