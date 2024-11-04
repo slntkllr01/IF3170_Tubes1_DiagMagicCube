@@ -267,7 +267,7 @@ class CubeSolverApp(QMainWindow):
             
             end_time = time.time()  
             duration = end_time - start_time  
-            print("INI "+str(duration))
+            print("duration: "+str(duration))
 
             self.history = self.solver.history
 
