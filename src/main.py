@@ -23,6 +23,7 @@ class CubeSolverApp(QMainWindow):
         
         self.solver = None
         self.history = None
+        self.mean_history = None
         self.historyvar = None
 
         self.central_widget = QWidget()
@@ -142,13 +143,20 @@ class CubeSolverApp(QMainWindow):
         self.layout.addWidget(self.solve_button)
 
         self.layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
-    
+
         self.plot_button = QPushButton("Show Objective Function Plot")
         self.plot_button.setFont(QFont("Arial", 12, QFont.Bold))
         self.plot_button.setStyleSheet("padding: 10px; background-color: #2196F3; color: white;")
         self.plot_button.clicked.connect(self.show_plot)
         self.plot_button.setEnabled(False)
         self.layout.addWidget(self.plot_button)
+
+        self.mean_GA = QPushButton("Show Mean Objective Function Plot")
+        self.mean_GA.setFont(QFont("Arial", 12, QFont.Bold))
+        self.mean_GA.setStyleSheet("padding: 10px; background-color: #FFA500; color: white;")
+        self.mean_GA.clicked.connect(self.show_GA_mean_plot)
+        self.mean_GA.setVisible(False)
+        self.layout.addWidget(self.mean_GA)
 
         self.prob_button = QPushButton("Show Probability Value Plot")
         self.prob_button.setFont(QFont("Arial", 12, QFont.Bold))
@@ -215,9 +223,11 @@ class CubeSolverApp(QMainWindow):
         self.maxit_input.setVisible(is_genetic)
         self.population_total.setVisible(is_genetic)
         self.population_input.setVisible(is_genetic)
+        self.mean_GA.setVisible(is_genetic)
 
     def solve_cube(self):
         try:
+            self.mean_GA.setEnabled(False)
             max_param = int(self.param_input.text()) if self.param_input.isVisible() else None
             restart_param = int(self.restart_input.text()) if self.restart_input.isVisible() else None
             max_sideways_moves = int(self.sideways_input.text()) if self.sideways_input.isVisible() else None
@@ -248,6 +258,7 @@ class CubeSolverApp(QMainWindow):
                 population_total = int(self.population_input.text())
                 self.solver = GeneticAlgorithm(5, population_total, max_param)
                 self.solver.solveGeneticAlgorithm()
+                self.mean_GA.setEnabled(True)
             else:
                 raise ValueError("Invalid algorithm selection")
             
@@ -256,7 +267,9 @@ class CubeSolverApp(QMainWindow):
             print("INI "+str(duration))
 
             self.history = self.solver.history
+            self.mean_history = self.solver.mean_history
             self.plot_button.setEnabled(True)
+
             self.visualizer_button.setEnabled(True)
 
             self.historyvar = self.solver.historyvar
@@ -270,6 +283,24 @@ class CubeSolverApp(QMainWindow):
         except ValueError:
             QMessageBox.warning(self, "Input Error", "Please enter a valid integer for maximum iterations.")
     
+    def show_GA_mean_plot(self):
+        if self.history is None:
+            QMessageBox.warning(self, "Error", "No solver history found.")
+            return
+        
+        frames = [entry["frame"] for entry in self.mean_history]
+        objective_values = [entry["objective_value"] for entry in self.mean_history]
+
+        plt.figure()
+        plt.plot(frames, objective_values, marker='o', color='#4CAF50')
+        plt.xlabel("Iteration")
+        plt.ylabel("Average Objective Function Value")
+        plt.title("Average Objective Function Value per Iteration Across Population")
+        plt.grid(True)
+        plt.show()
+
+
+
     def show_plot(self):
         if self.history is None:
             QMessageBox.warning(self, "Error", "No solver history found.")

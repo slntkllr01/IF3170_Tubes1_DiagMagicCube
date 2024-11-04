@@ -1,15 +1,17 @@
 from utils.node import Node
 from utils.utility import Utility
 from concurrent.futures import ThreadPoolExecutor
+import statistics
 import random
 
 class GeneticAlgorithm:
     def __init__(self, cube_size, population_size, max_iterations):
         self.population = [Node(cube = None, cube_size = cube_size) for i in range (population_size)]
         self.population_size = population_size
-        self.mutation_rate = 0.3
+        self.mutation_rate = 0.1
         self.max_iterations = max_iterations
         self.history = []
+        self.mean_history = []
 
     def calculatePopulationFitness(self):
         result = []
@@ -21,8 +23,7 @@ class GeneticAlgorithm:
         total = sum(result)
 
         if total == 0:
-            return [1 / self.population_size] * self.population_size
-    
+            return [1/self.population_size] * len(self.population)
         for i in range (len(self.population)):
             temp = result[i]
             result[i] = temp / total
@@ -101,10 +102,12 @@ class GeneticAlgorithm:
                 new_generation.append(Node(offspring2))
 
             best_individual = min(new_generation, key=lambda node: node.calculateHeuristic())
+            mean_population = statistics.mean([node.calculateHeuristic() for node in new_generation])
             best_fitness = best_individual.calculateHeuristic()
             print(f"Generasi {i + 1}: Fitness terbaik = {best_fitness}")
 
             self.history.append({"frame": i + 1, "cube": best_individual.cube, "objective_value": best_fitness})
+            self.mean_history.append({"frame": i + 1, "cube": best_individual.cube, "objective_value": mean_population})
             
             if best_fitness == 0:
                 print("Solusi optimal ditemukan!")
