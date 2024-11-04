@@ -23,6 +23,7 @@ class CubeSolverApp(QMainWindow):
         
         self.solver = None
         self.history = None
+        self.historyvar = None
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -148,6 +149,13 @@ class CubeSolverApp(QMainWindow):
         self.plot_button.clicked.connect(self.show_plot)
         self.plot_button.setEnabled(False)
         self.layout.addWidget(self.plot_button)
+
+        self.prob_button = QPushButton("Show Probability Value Plot")
+        self.prob_button.setFont(QFont("Arial", 12, QFont.Bold))
+        self.prob_button.setStyleSheet("padding: 10px; background-color: #8451ad; color: white;")
+        self.prob_button.clicked.connect(self.showvar_plot)
+        self.prob_button.setEnabled(False)
+        self.layout.addWidget(self.prob_button)
         
         self.visualizer_button = QPushButton("Open Cube Visualizer")
         self.visualizer_button.setFont(QFont("Arial", 12, QFont.Bold))
@@ -184,6 +192,7 @@ class CubeSolverApp(QMainWindow):
         self.param_input.setVisible(is_stochastic)
         
         is_annealing = (algorithm == 2)
+        self.prob_button.setVisible(is_annealing)
         self.temp_label.setVisible(is_annealing)
         self.temp_input.setVisible(is_annealing)
         self.cooling_label.setVisible(is_annealing)
@@ -242,9 +251,14 @@ class CubeSolverApp(QMainWindow):
             
             end_time = time.time()  
             duration = end_time - start_time  
+            print("INI "+str(duration))
 
             self.history = self.solver.history
             self.plot_button.setEnabled(True)
+            self.visualizer_button.setEnabled(True)
+
+            self.historyvar = self.solver.historyvar
+            self.prob_button.setEnabled(True)
             self.visualizer_button.setEnabled(True)
             
             # Save history to JSON
@@ -283,6 +297,26 @@ class CubeSolverApp(QMainWindow):
             plt.title("Objective Function Value over Iterations")
             plt.grid(True)
             plt.show()
+    
+    def showvar_plot(self):
+        if self.historyvar is None:
+            QMessageBox.warning(self, "Error", "No solver var history found.")
+            return
+        
+        algorithm = self.algo_dropdown.currentIndex()
+        if algorithm==2:
+            frames = [entry["frame"] for entry in self.historyvar]
+            prob_values = [entry["var_value"] for entry in self.historyvar]
+    
+            plt.figure()
+            plt.plot(frames, prob_values, marker='o', color='#4CAF50')
+            plt.xlabel("Iteration")
+            plt.ylabel("Probability Values")
+            plt.title("Probability Values over Iterations")
+            plt.grid(True)
+            plt.show()
+        else:
+            QMessageBox.warning(self, "Error", "Is not annealing.")
         
     def open_visualizer(self):
         # Open the CubeVisualizer 
