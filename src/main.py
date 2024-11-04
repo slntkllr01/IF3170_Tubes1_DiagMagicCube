@@ -219,7 +219,7 @@ class CubeSolverApp(QMainWindow):
                 self.solver.solveCube(restart_param)
             elif algorithm == 1:
                 self.solver = Stochastic()
-                self.solver.solveCube(max_param,num_workers=5)
+                self.solver.solveCube(max_param)
             elif algorithm == 2:
                 initial_temp = float(self.temp_input.text())
                 cooling_rate = float(self.cooling_input.text())
